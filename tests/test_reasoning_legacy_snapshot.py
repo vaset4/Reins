@@ -30,8 +30,6 @@ def test_persisted_snapshot_keeps_old_default_at_execution_boundary(
         "selected", "proxy", "http://localhost/v1", "grok-4.7", reasoning_effort="xhigh"
     )
     monkeypatch.setattr(cli, "_load_named_model_profile", lambda name: profile)
-    monkeypatch.setattr(cli, "load_project_llm_defaults", lambda root: {})
-    monkeypatch.setattr(cli, "load_saved_config", lambda: {})
     monkeypatch.setattr(
         cli, "SecretsVault", lambda: SimpleNamespace(get=lambda name: None)
     )

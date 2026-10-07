@@ -639,7 +639,7 @@ def _hard_block_detail(category: str, evidence: str) -> str:
     if category == "model_not_found":
         return "模型不存在或不可用，请检查模型名称和供应商配置（/model show）。"
     if category == "missing_config":
-        return "缺少必要的模型配置。请使用 /model set 或检查环境变量。"
+        return "缺少必要的模型配置。请检查 ~/.reins/models.json，并通过 secret set 将凭据保存到 ~/.reins/.env。"
     if "mcp" in lowered:
         return "The requested MCP capability is not configured or is unavailable."
     if "browser" in lowered:

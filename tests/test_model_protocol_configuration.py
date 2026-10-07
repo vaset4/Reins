@@ -15,8 +15,7 @@ from threading import Thread
 import pytest
 
 from app.cli import build_llm_client
-from llm.config import load_saved_config, save_user_config
-from llm.profiles import save_model_profile
+from llm.profiles import load_model_profiles
 from llm.resolved_target import resolve_model_target
 from runtime.agent_loop import AgentLoop, State
 from runtime.workspaces import WorkspaceStore
@@ -119,12 +118,10 @@ def test_saved_profile_drives_production_sdk_tool_roundtrip(
 ):
     """保存的协议经过真实装配、SDK和工具结果回填；传参：隔离配置与协议；返回：无。"""
     data = tmp_path / "data"
-    profiles = tmp_path / "models.yaml"
-    monkeypatch.setattr("llm.profiles.MODELS_CONFIG_PATH", profiles)
+    profiles = tmp_path / "models.json"
     monkeypatch.setattr(
         "llm.profiles.MODELS_JSON_CONFIG_PATH", tmp_path / "models.json"
     )
-    monkeypatch.setattr("llm.config.SAVED_CONFIG_PATH", tmp_path / "config.yaml")
     monkeypatch.setattr("app.cli.SecretsVault", lambda: {})
     monkeypatch.setenv("XIANGMU_LLM_API_KEY", "synthetic-protocol-configuration-token")
     (tmp_path / "a.txt").write_text("material-from-real-file", encoding="utf-8")
@@ -148,17 +145,24 @@ def test_saved_profile_drives_production_sdk_tool_roundtrip(
         closing(TaskStore(data)) as tasks,
     ):
         base = endpoint if family == "anthropic_messages" else endpoint + "/v1"
-        save_model_profile(
-            "configured",
-            {
-                "provider": "fixture",
-                "model": "configured-model",
-                "base_url": base,
-                "api_mode": mode,
-                "context_window": 12000,
-                "max_output_tokens": 512,
-            },
-            profiles,
+        profiles.write_text(
+            json.dumps(
+                {
+                    "active_provider": "fixture",
+                    "active_model": "configured",
+                    "providers": {
+                        "fixture": {
+                            "model_provider": "custom",
+                            "base_url": base,
+                            "api_mode": mode,
+                            "context_window": 12000,
+                            "max_output_tokens": 512,
+                            "models": {"configured": {"model": "configured-model"}},
+                        }
+                    },
+                }
+            ),
+            encoding="utf-8",
         )
         client = build_llm_client({}, tmp_path)
         task = tasks.create_task("读取资料")
@@ -199,37 +203,37 @@ def test_saved_profile_drives_production_sdk_tool_roundtrip(
         assert client.resolved_target.api_mode == mode
 
 
-def test_saved_api_mode_is_retained_and_invalid_update_does_not_replace_it(tmp_path):
-    """普通保存入口保留协议且拒绝拼错模式；传参：临时配置；返回：无。"""
-    path = tmp_path / "config.yaml"
-    save_user_config({"api_mode": "responses"}, path)
-    assert load_saved_config(path)["api_mode"] == "responses"
-    before = path.read_bytes()
-    with pytest.raises(ValueError, match="unsupported.*api_mode"):
-        save_user_config({"api_mode": "unknown"}, path)
-    assert path.read_bytes() == before
-
-
 @pytest.mark.parametrize("value", [12.5, "12.5", False, -1, float("inf"), "NaN", ""])
-@pytest.mark.parametrize("source", ["saved", "profile", "env"])
+@pytest.mark.parametrize("source", ["profile", "env"])
 def test_output_budget_rejects_invalid_values_without_rounding(
     tmp_path, monkeypatch, value, source
 ):
-    """三种配置入口不能把无效输出额度截断或改成默认值；传参：配置入口及值；返回：无。"""
+    """配置入口不能把无效输出额度截断或改成默认值；传参：配置入口及值；返回：无。"""
     with pytest.raises(ValueError, match="max_output_tokens.*positive integer"):
-        if source == "saved":
-            save_user_config({"max_output_tokens": value}, tmp_path / "config.yaml")
-        elif source == "profile":
-            save_model_profile(
-                "profile",
-                {
-                    "provider": "fixture",
-                    "base_url": "http://localhost/v1",
-                    "model": "fixture",
-                    "max_output_tokens": value,
-                },
-                tmp_path / "models.yaml",
+        if source == "profile":
+            path = tmp_path / "models.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "active_provider": "fixture",
+                        "active_model": "main",
+                        "providers": {
+                            "fixture": {
+                                "model_provider": "custom",
+                                "base_url": "http://localhost/v1",
+                                "models": {
+                                    "main": {
+                                        "model": "fixture",
+                                        "max_output_tokens": value,
+                                    }
+                                },
+                            }
+                        },
+                    }
+                ),
+                encoding="utf-8",
             )
+            load_model_profiles(path)
         else:
             monkeypatch.setenv("XIANGMU_LLM_MAX_OUTPUT_TOKENS", str(value))
             resolve_model_target()

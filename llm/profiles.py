@@ -2,11 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from tempfile import NamedTemporaryFile
-import os
 from typing import Any, Mapping
 
-import yaml
 
 from llm.api_modes import DEFAULT_API_MODE, require_api_mode
 from llm.config import parse_positive_int
@@ -17,7 +14,6 @@ from llm.model_catalog import (
     switch_model_catalog_profile,
 )
 
-MODELS_CONFIG_PATH = Path.home() / ".reins" / "models.yaml"
 DEFAULT_CONTEXT_WINDOW = 30000
 DEFAULT_TIMEOUT_SECONDS = 30.0
 ALLOWED_PROFILE_KEYS = frozenset(
@@ -82,91 +78,9 @@ class ModelProfilesConfig:
 
 
 def load_model_profiles(path: Path | None = None) -> ModelProfilesConfig:
-    if path is None and MODELS_JSON_CONFIG_PATH.exists():
-        return _load_json_profiles(MODELS_JSON_CONFIG_PATH)
-    config_path = _resolve_path(path)
-    if config_path.suffix.lower() == ".json":
-        return _load_json_profiles(config_path)
-    if not config_path.exists():
-        return ModelProfilesConfig(path=config_path)
-    raw = _read_yaml_object(config_path)
-    active = _required_text(raw.get("active"), "active")
-    profiles_raw = raw.get("profiles")
-    if not isinstance(profiles_raw, dict) or not profiles_raw:
-        raise ValueError("profiles must contain at least one profile")
-    profiles = _parse_profiles(profiles_raw)
-    if active not in profiles:
-        raise ValueError(f"active profile not found: {active}")
-    return ModelProfilesConfig(
-        path=config_path, active=active, profiles=profiles, source="models_yaml"
-    )
-
-
-def save_model_profile(
-    name: str, updates: dict[str, object], path: Path | None = None
-) -> None:
-    if path is None and MODELS_JSON_CONFIG_PATH.exists():
-        raise ValueError("models.json profiles must be edited in models.json")
-    profile_name = _clean_profile_name(name)
-    _reject_forbidden_keys(updates)
-    _reject_unknown_profile_keys(updates)
-    config_path = _resolve_path(path)
-    if config_path.suffix.lower() == ".json":
-        raise ValueError("models.json profiles must be edited in models.json")
-    raw = _read_yaml_object(config_path) if config_path.exists() else {}
-    profiles = _profiles_for_write(raw)
-    existing = profiles.get(profile_name, {})
-    if not isinstance(existing, dict):
-        raise ValueError(f"profile must contain a YAML object: {profile_name}")
-    merged = dict(existing)
-    merged.update(updates)
-    profile = _parse_profile(profile_name, merged)
-    profiles[profile_name] = _profile_to_yaml(profile)
-    if not _optional_text(raw.get("active")):
-        raw["active"] = profile_name
-    _validate_raw_for_write(raw)
-    _write_yaml(config_path, raw)
-
-
-def switch_active_model_profile(
-    name: str, path: Path | None = None, *, reasoning_effort: str | None = None
-) -> None:
-    """一次保存模型及可选强度；传参：配置名、路径及档位；返回：无，校验失败不写入。"""
-    profile_name = _clean_profile_name(name)
-    if path is None and MODELS_JSON_CONFIG_PATH.exists():
-        switch_model_catalog_profile(
-            profile_name, MODELS_JSON_CONFIG_PATH, reasoning_effort=reasoning_effort
-        )
-        return
-    config_path = _resolve_path(path)
-    if config_path.suffix.lower() == ".json":
-        switch_model_catalog_profile(
-            profile_name, config_path, reasoning_effort=reasoning_effort
-        )
-        return
-    config = load_model_profiles(config_path)
-    if profile_name not in config.profiles:
-        raise ValueError(f"profile not found: {profile_name}")
-    raw = _read_yaml_object(config_path)
-    if reasoning_effort is not None:
-        profile = config.profiles[profile_name]
-        effort = validate_reasoning_effort(
-            reasoning_effort, profile.model, profile.api_mode
-        )
-        if effort is None:
-            raw["profiles"][profile_name].pop("reasoning_effort", None)
-        else:
-            raw["profiles"][profile_name]["reasoning_effort"] = effort
-    raw["active"] = profile_name
-    _write_yaml(config_path, raw)
-
-
-def _resolve_path(path: Path | None) -> Path:
-    return path or MODELS_CONFIG_PATH
-
-
-def _load_json_profiles(path: Path) -> ModelProfilesConfig:
-    catalog = load_model_catalog(path)
+    """读取模型目录；传参：可选 JSON 路径；返回：活动模型及可选配置。"""
+    config_path = path or MODELS_JSON_CONFIG_PATH
+    catalog = load_model_catalog(config_path)
     profiles = {
         name: _parse_profile(name, values) for name, values in catalog.profiles.items()
     }
@@ -174,32 +88,22 @@ def _load_json_profiles(path: Path) -> ModelProfilesConfig:
         path=catalog.path,
         active=catalog.active,
         profiles=profiles,
-        source="models_json",
+        source="models_json" if profiles else "missing",
     )
 
 
-def _read_yaml_object(path: Path) -> dict[str, Any]:
-    try:
-        loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except yaml.YAMLError as exc:
-        raise ValueError(f"failed to parse {path}: {exc}") from exc
-    if not isinstance(loaded, dict):
-        raise ValueError("models.yaml must contain a YAML object")
-    _reject_forbidden_keys(loaded)
-    return dict(loaded)
-
-
-def _parse_profiles(raw: dict[object, object]) -> dict[str, ModelProfile]:
-    profiles: dict[str, ModelProfile] = {}
-    for name, value in raw.items():
-        profile_name = _clean_profile_name(name)
-        profiles[profile_name] = _parse_profile(profile_name, value)
-    return profiles
+def switch_active_model_profile(
+    name: str, path: Path | None = None, *, reasoning_effort: str | None = None
+) -> None:
+    """保存模型及可选强度；传参：provider:model、JSON 路径及档位；返回：无。"""
+    switch_model_catalog_profile(
+        name, path or MODELS_JSON_CONFIG_PATH, reasoning_effort=reasoning_effort
+    )
 
 
 def _parse_profile(name: str, raw: object) -> ModelProfile:
     if not isinstance(raw, dict):
-        raise ValueError(f"profile must contain a YAML object: {name}")
+        raise ValueError(f"profile must contain a JSON object: {name}")
     _reject_forbidden_keys(raw)
     _reject_unknown_profile_keys(raw)
     _require_profile_fields(raw, name)
@@ -231,25 +135,6 @@ def _parse_profile(name: str, raw: object) -> ModelProfile:
     )
 
 
-def _profiles_for_write(raw: dict[str, Any]) -> dict[str, Any]:
-    profiles = raw.setdefault("profiles", {})
-    if not isinstance(profiles, dict):
-        raise ValueError("profiles must contain a YAML object")
-    return profiles
-
-
-def _validate_raw_for_write(raw: dict[str, Any]) -> None:
-    active = _optional_text(raw.get("active"))
-    if active and active not in _profiles_for_write(raw):
-        raise ValueError(f"active profile not found: {active}")
-    _reject_forbidden_keys(raw)
-
-
-def _profile_to_yaml(profile: ModelProfile) -> dict[str, object]:
-    values = profile.as_config()
-    return {key: value for key, value in values.items() if value not in ("", None)}
-
-
 def _require_profile_fields(raw: dict[object, object], name: str) -> None:
     missing = [
         field
@@ -267,7 +152,7 @@ def _reject_forbidden_keys(value: object) -> None:
     _collect_forbidden_keys(value, found)
     if found:
         raise ValueError(
-            "models.yaml must not contain credential fields: "
+            "models.json must not contain credential fields: "
             f"{', '.join(sorted(set(found)))}"
         )
 
@@ -288,13 +173,6 @@ def _reject_unknown_profile_keys(raw: Mapping[Any, object]) -> None:
     unknown = sorted(str(key) for key in raw if str(key) not in ALLOWED_PROFILE_KEYS)
     if unknown:
         raise ValueError(f"unknown profile fields: {', '.join(unknown)}")
-
-
-def _clean_profile_name(value: object) -> str:
-    text = _optional_text(value)
-    if not text:
-        raise ValueError("profile name must be non-empty")
-    return text
 
 
 def _required_text(value: object, field_name: str) -> str:
@@ -331,34 +209,10 @@ def _positive_float(value: object, field_name: str) -> float:
     return parsed
 
 
-def _write_yaml(path: Path, raw: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    # 【模型配置】【保存选择】临时文件完整写入后替换，读者不会看到半套模型和强度
-    with NamedTemporaryFile(
-        mode="w", encoding="utf-8", dir=path.parent, delete=False
-    ) as stream:
-        pending = Path(stream.name)
-        try:
-            stream.write(yaml.safe_dump(raw, allow_unicode=True, sort_keys=True))
-            stream.flush()
-            os.fsync(stream.fileno())
-        except BaseException:
-            stream.close()
-            pending.unlink()
-            raise
-    try:
-        os.replace(pending, path)
-    finally:
-        pending.unlink(missing_ok=True)
-
-
 __all__ = [
-    "ALLOWED_PROFILE_KEYS",
     "MODELS_JSON_CONFIG_PATH",
-    "MODELS_CONFIG_PATH",
     "ModelProfile",
     "ModelProfilesConfig",
     "load_model_profiles",
-    "save_model_profile",
     "switch_active_model_profile",
 ]

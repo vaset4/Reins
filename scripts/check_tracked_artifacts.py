@@ -17,7 +17,7 @@ RAW_EVIDENCE_FRAGMENTS = (
 )
 BLOCKED_EXACT_PATHS = {
     ".reins/config/observe_prices.yaml": "local observe price config",
-    "llm.json": "local LLM config; use llm.example.json as the tracked template",
+    "llm.json": "retired local LLM config; use models.example.json for the current model catalog",
 }
 BLOCKED_PREFIXES = {
     ".reins/data/": "Reins runtime data",

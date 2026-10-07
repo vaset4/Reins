@@ -1,4 +1,4 @@
-"""Tests for ~/.reins/models.yaml provider profiles."""
+"""models.json 目录读取、校验及模型选择回归。"""
 
 from __future__ import annotations
 
@@ -6,50 +6,19 @@ import json
 
 import pytest
 
-from llm.profiles import (
-    load_model_profiles,
-    save_model_profile,
-    switch_active_model_profile,
-)
+from llm.profiles import load_model_profiles, switch_active_model_profile
 
 
-def test_missing_models_yaml_returns_empty_config(tmp_path):
-    config = load_model_profiles(tmp_path / "models.yaml")
-
-    assert config.active == ""
+def test_missing_json_does_not_load_old_yaml(tmp_path, monkeypatch):
+    """传参：隔离目录；返回：无，旧文件不能成为默认模型来源。"""
+    path = tmp_path / "models.json"
+    (tmp_path / "models.yaml").write_text("active: old\nprofiles: {}", encoding="utf-8")
+    monkeypatch.setattr("llm.profiles.MODELS_JSON_CONFIG_PATH", path)
+    config = load_model_profiles()
+    assert config.path == path
+    assert config.source == "missing"
     assert config.active_profile is None
     assert config.profiles == {}
-
-
-def test_loads_active_profile(tmp_path):
-    config_path = tmp_path / "models.yaml"
-    config_path.write_text(
-        "\n".join(
-            [
-                "active: glm-main",
-                "profiles:",
-                "  glm-main:",
-                "    provider: openai_compatible",
-                "    base_url: https://provider.example/v1",
-                "    model: glm-5.1",
-                "    credential: openai_compatible_api_key",
-                "    api_mode: chat_completions",
-                "    context_window: 30000",
-            ]
-        ),
-        encoding="utf-8",
-    )
-
-    config = load_model_profiles(config_path)
-    profile = config.active_profile
-
-    assert profile is not None
-    assert profile.name == "glm-main"
-    assert profile.provider == "openai_compatible"
-    assert profile.base_url == "https://provider.example/v1"
-    assert profile.model == "glm-5.1"
-    assert profile.credential == "openai_compatible_api_key"
-    assert profile.as_config()["context_window"] == 30000
 
 
 def test_loads_models_json_catalog(tmp_path):
@@ -163,103 +132,83 @@ def test_models_json_accepts_trailing_commas(tmp_path):
 
 
 @pytest.mark.parametrize(
-    ("content", "message"),
+    ("field", "value", "message"),
     [
-        ("[]\n", "must contain a YAML object"),
-        (
-            "active: missing\nprofiles: {}\n",
-            "profiles must contain at least one profile",
-        ),
-        (
-            "active: missing\nprofiles:\n  glm:\n    provider: openai_compatible\n    base_url: https://x/v1\n    model: glm\n",
-            "active profile not found",
-        ),
-        (
-            "active: glm\nprofiles:\n  glm:\n    provider: openai_compatible\n    model: glm\n",
-            "base_url",
-        ),
-        (
-            "active: glm\nprofiles:\n  glm:\n    provider: openai_compatible\n    base_url: https://x/v1\n    model: glm\n    api_mode: unknown\n",
-            "unsupported api_mode",
-        ),
-        (
-            "active: glm\nprofiles:\n  glm:\n    provider: openai_compatible\n    base_url: https://x/v1\n    model: glm\n    context_window: no\n",
-            "context_window",
-        ),
-        (
-            "active: glm\nprofiles:\n  glm:\n    provider: openai_compatible\n    base_url: https://x/v1\n    model: glm\n    api_key: sk-test\n",
-            "credential fields",
-        ),
+        ("api_key", "synthetic-secret", "credential fields"),
+        ("api_mode", "unknown", "unsupported api_mode"),
+        ("context_window", "invalid", "context_window"),
+        ("base_url", "", "base_url"),
     ],
 )
-def test_rejects_invalid_models_yaml(tmp_path, content, message):
-    config_path = tmp_path / "models.yaml"
-    config_path.write_text(content, encoding="utf-8")
-
-    with pytest.raises(ValueError, match=message):
-        load_model_profiles(config_path)
-
-
-def test_save_profile_writes_non_secret_fields(tmp_path):
-    config_path = tmp_path / "models.yaml"
-
-    save_model_profile(
-        "glm-main",
-        {
-            "provider": "openai_compatible",
-            "base_url": "https://provider.example/v1",
-            "model": "glm-5.1",
-            "credential": "openai_compatible_api_key",
-        },
-        config_path,
-    )
-
-    text = config_path.read_text(encoding="utf-8")
-    config = load_model_profiles(config_path)
-
-    assert config.active == "glm-main"
-    assert "openai_compatible_api_key" in text
-    assert "api_key:" not in text
-    assert "sk-" not in text
-
-
-def test_save_profile_rejects_raw_secret_fields(tmp_path):
-    with pytest.raises(ValueError, match="credential fields"):
-        save_model_profile(
-            "glm-main",
+def test_rejects_invalid_json_provider(tmp_path, field, value, message):
+    """传参：非法配置字段；返回：无，JSON 同样校验凭据与模型参数。"""
+    provider = {
+        "model_provider": "custom",
+        "base_url": "https://example.test/v1",
+        "models": {"main": {"model": "test-model"}},
+        field: value,
+    }
+    path = tmp_path / "models.json"
+    path.write_text(
+        json.dumps(
             {
-                "provider": "openai_compatible",
-                "base_url": "https://provider.example/v1",
-                "model": "glm-5.1",
-                "api_key": "sk-test",
-            },
-            tmp_path / "models.yaml",
-        )
-
-
-def test_switch_active_profile_preserves_profiles(tmp_path):
-    config_path = tmp_path / "models.yaml"
-    save_model_profile(
-        "first",
-        {
-            "provider": "openai_compatible",
-            "base_url": "https://first.example/v1",
-            "model": "first-model",
-        },
-        config_path,
+                "active_provider": "proxy",
+                "active_model": "main",
+                "providers": {"proxy": provider},
+            }
+        ),
+        encoding="utf-8",
     )
-    save_model_profile(
-        "second",
-        {
-            "provider": "openai_compatible",
-            "base_url": "https://second.example/v1",
-            "model": "second-model",
-        },
-        config_path,
+    with pytest.raises(ValueError, match=message):
+        load_model_profiles(path)
+
+
+def test_explicit_yaml_is_not_parsed(tmp_path):
+    """传参：旧格式文件；返回：无，显式旧配置不能继续被解析。"""
+    path = tmp_path / "models.yaml"
+    path.write_text("active: old\nprofiles: {}", encoding="utf-8")
+    with pytest.raises(ValueError, match="failed to parse"):
+        load_model_profiles(path)
+
+
+@pytest.mark.parametrize("entry", ["cli", "probe"])
+def test_entries_ignore_old_model_files(tmp_path, monkeypatch, entry):
+    """传参：入口和隔离配置；返回：无，旧模型文件不能覆盖 JSON 选择。"""
+    from app import cli
+    from scripts import probe_llm_api
+
+    path = tmp_path / "models.json"
+    path.write_text(
+        json.dumps(
+            {
+                "active_provider": "proxy",
+                "active_model": "main",
+                "providers": {
+                    "proxy": {
+                        "model_provider": "custom",
+                        "base_url": "http://localhost/v1",
+                        "credential": "fixture-key",
+                        "models": {"main": {"model": "current-model"}},
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
     )
-
-    switch_active_model_profile("second", config_path)
-    config = load_model_profiles(config_path)
-
-    assert config.active == "second"
-    assert set(config.profiles) == {"first", "second"}
+    (tmp_path / "llm.json").write_text('{"model": "old-project"}', encoding="utf-8")
+    (tmp_path / "config.yaml").write_text("llm:\n  model: old-user\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("llm.profiles.MODELS_JSON_CONFIG_PATH", path)
+    monkeypatch.setattr(cli, "SecretsVault", lambda: {"fixture-key": "synthetic-token"})
+    monkeypatch.setattr(
+        "reins_secrets.store.SecretsVault", lambda: {"fixture-key": "synthetic-token"}
+    )
+    monkeypatch.delenv("XIANGMU_LLM_MODEL", raising=False)
+    monkeypatch.delenv("XIANGMU_LLM_BASE_URL", raising=False)
+    if entry == "cli":
+        target = cli.build_llm_client({}, project_root=tmp_path).resolved_target
+    else:
+        target = probe_llm_api._resolve_target(probe_llm_api._parse_args([]))
+    assert target.model == "current-model"
+    assert target.profile_name == "proxy:main"
+    assert target.api_key == "synthetic-token"

@@ -4,7 +4,7 @@ import argparse
 import importlib
 import json
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 from urllib.error import HTTPError, URLError
@@ -34,9 +34,8 @@ class ProbeResult:
 
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
-    project_root = Path(args.project_root).resolve()
     try:
-        target = _resolve_target(args, project_root)
+        target = _resolve_target(args)
     except Exception as exc:
         print(f"config_error: {exc}", file=sys.stderr)
         return 2
@@ -58,9 +57,6 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Probe the active Reins OpenAI-compatible API profile."
     )
-    parser.add_argument(
-        "--project-root", default=".", help="Project root with llm.json."
-    )
     parser.add_argument("--base-url", dest="base_url", help="Override base URL.")
     parser.add_argument("--model", help="Override model.")
     parser.add_argument("--api-key-env", help="Read API key from this env var.")
@@ -77,27 +73,28 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
 
 def _resolve_target(
     args: argparse.Namespace,
-    project_root: Path,
 ) -> ResolvedModelTarget:
-    config = importlib.import_module("llm.config")
     profiles_module = importlib.import_module("llm.profiles")
     resolved = importlib.import_module("llm.resolved_target")
     secrets_store = importlib.import_module("reins_secrets.store")
     cli_overrides = _cli_overrides(args)
     if args.api_key_env:
         cli_overrides["api_key"] = _env_value(args.api_key_env)
-    file_defaults = config.load_project_llm_defaults(project_root)
     profiles = profiles_module.load_model_profiles()
     active_profile = profiles.active_profile
     target = resolved.resolve_model_target(
         cli_overrides=cli_overrides,
-        profile_config=active_profile.as_config() if active_profile else None,
-        profile_name=profiles.active,
-        saved_config=config.load_saved_config(),
-        file_defaults=file_defaults,
+        file_defaults=active_profile.as_config() if active_profile else None,
         secrets_vault=secrets_store.SecretsVault(),
     )
-    return cast("ResolvedModelTarget", target)
+    return cast(
+        "ResolvedModelTarget",
+        replace(
+            target,
+            profile_name=profiles.active,
+            credential_name=active_profile.credential if active_profile else "",
+        ),
+    )
 
 
 def _cli_overrides(args: argparse.Namespace) -> dict[str, object]:

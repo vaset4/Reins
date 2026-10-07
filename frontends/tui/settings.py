@@ -118,8 +118,8 @@ class SettingsScreen(ModalScreen[str | None]):
         yield Button("应用模型与思考强度", id="apply-model", disabled=not options)
         if not self.profiles:
             yield Static(
-                "尚无模型配置。请在 ~/.reins/models.json 或 models.yaml 配置供应商、模型和凭据引用；"
-                "也可使用 /model profile set。",
+                "尚无模型配置。请在 ~/.reins/models.json 配置供应商、模型和凭据引用，"
+                "在 ~/.reins/.env 配置对应密钥。",
                 markup=False,
             )
 
@@ -189,7 +189,7 @@ class SettingsScreen(ModalScreen[str | None]):
                     "上下文与记忆：查看、暂停或取消", id="open-context-management"
                 )
                 yield Static(
-                    "更多配置：/model set、/model profile set；授权查询 /mode，撤回 /revoke；F1 帮助",
+                    "模型目录：~/.reins/models.json；密钥：~/.reins/.env；授权查询 /mode，撤回 /revoke；F1 帮助",
                     markup=False,
                 )
             with Horizontal(classes="dialog-actions"):

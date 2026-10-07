@@ -8,7 +8,6 @@ import asyncio
 import json
 
 import pytest
-import yaml
 from textual.widgets import Select
 
 from frontends.tui.composer import Composer
@@ -24,24 +23,24 @@ def picker_data():
     """提供两个供应商、三模型的公开事实；参数：无；返回：设置快照。"""
     return {
         "session_id": "",
-        "input_model": {"profile_name": "first"},
+        "input_model": {"profile_name": "甲:first"},
         "approval_mode": "workspace",
         "profiles": [
             {
-                "name": "first",
+                "name": "甲:first",
                 "provider": "proxy",
                 "provider_group": "甲",
                 "model": "custom",
             },
             {
-                "name": "second",
+                "name": "乙:second",
                 "provider": "proxy",
                 "provider_group": "乙",
                 "model": "glm-5.2",
                 "reasoning_options": ["high", "max"],
             },
             {
-                "name": "third",
+                "name": "乙:third",
                 "provider": "proxy",
                 "provider_group": "乙",
                 "model": "custom",
@@ -73,7 +72,7 @@ def test_model_command_opens_keyboard_picker_and_f6_keeps_draft():
             # 1. 按供应商排序通过键盘切到乙，仅显示乙的模型配置
             assert provider.value == "乙"
             await pilot.pause()
-            assert app.screen.query_one("#model-choice", Select).value == "second"
+            assert app.screen.query_one("#model-choice", Select).value == "乙:second"
             effort = app.screen.query_one("#reasoning-choice", Select)
             effort.focus()
             await pilot.press("enter", "end", "enter")
@@ -82,7 +81,7 @@ def test_model_command_opens_keyboard_picker_and_f6_keeps_draft():
             await app.workers.wait_for_complete()
             await pilot.pause()
             assert bridge.submitted == [
-                "/model profile use second reasoning_effort=max"
+                "/model profile use 乙:second reasoning_effort=max"
             ]
             composer.load_text("草稿保留")
             await pilot.press("f6")
@@ -99,15 +98,15 @@ def test_profile_effort_reaches_new_input_and_preserves_previous(tmp_path, monke
     """真实工厂选择强度后公开请求冻结新值；参数：隔离配置；返回：无。"""
     bridge, host, _ = configured_bridge(tmp_path, monkeypatch)
     config = load_model_profiles()
-    raw = yaml.safe_load(config.path.read_text(encoding="utf-8"))
-    raw["profiles"]["new"]["model"] = "glm-5.2"
-    config.path.write_text(yaml.safe_dump(raw), encoding="utf-8")
+    raw = json.loads(config.path.read_text(encoding="utf-8"))
+    raw["providers"]["proxy"]["models"]["new"]["model"] = "glm-5.2"
+    config.path.write_text(json.dumps(raw), encoding="utf-8")
     previous = host.config.llm_client
-    bridge.submit("/model profile use new reasoning_effort=max")
+    bridge.submit("/model profile use proxy:new reasoning_effort=max")
     assert public_model_config(host.config.llm_client)["reasoning_effort"] == "max"
     assert public_model_config(previous)["reasoning_effort"] == "default"
     assert load_model_profiles().active_profile.reasoning_effort == "max"
-    bridge.submit("/model profile use new reasoning_effort=default")
+    bridge.submit("/model profile use proxy:new reasoning_effort=default")
     assert public_model_config(host.config.llm_client)["reasoning_effort"] == "default"
     assert load_model_profiles().active_profile.reasoning_effort is None
 
@@ -117,8 +116,8 @@ def test_invalid_effort_does_not_change_saved_profile(tmp_path, monkeypatch):
     bridge, host, _ = configured_bridge(tmp_path, monkeypatch)
     previous = host.config.llm_client
     with pytest.raises(ValueError, match="unsupported reasoning_effort"):
-        bridge.submit("/model profile use new reasoning_effort=high")
-    assert load_model_profiles().active == "old"
+        bridge.submit("/model profile use proxy:new reasoning_effort=high")
+    assert load_model_profiles().active == "proxy:old"
     assert host.config.llm_client is previous
 
 

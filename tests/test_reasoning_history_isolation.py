@@ -68,8 +68,6 @@ def test_schedule_roundtrip_keeps_reasoning_selection_after_profile_change(
         reasoning_effort="low",
     )
     monkeypatch.setattr(cli, "_load_named_model_profile", lambda name: profile)
-    monkeypatch.setattr(cli, "load_project_llm_defaults", lambda root: {})
-    monkeypatch.setattr(cli, "load_saved_config", lambda: {})
     monkeypatch.setattr(
         cli, "SecretsVault", lambda: SimpleNamespace(get=lambda name: None)
     )

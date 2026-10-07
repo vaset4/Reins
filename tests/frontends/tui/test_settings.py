@@ -5,10 +5,10 @@
 """
 
 import asyncio
+import json
 from threading import Event, RLock
 from types import SimpleNamespace
 
-import yaml
 import pytest
 
 from app.background.frontend import BackgroundSessionHost
@@ -32,34 +32,30 @@ from tools.tool_registry import ToolRegistry
 
 def configured_bridge(tmp_path, monkeypatch):
     """隔离所有配置读取，只替换凭据提供者；参数：临时目录与补丁；返回：真实桥接、宿主和回执。"""
-    path = tmp_path / "models.yaml"
-    profile = {
-        "provider": "openai_compatible",
+    path = tmp_path / "models.json"
+    provider = {
+        "model_provider": "openai_compatible",
         "base_url": "https://example.invalid/v1",
-        "model": "model-old",
         "credential": "test-key",
         "api_mode": "chat_completions",
+        "models": {"old": {"model": "model-old"}, "new": {"model": "model-new"}},
     }
     path.write_text(
-        yaml.safe_dump(
+        json.dumps(
             {
-                "active": "old",
-                "profiles": {"old": profile, "new": {**profile, "model": "model-new"}},
+                "active_provider": "proxy",
+                "active_model": "old",
+                "providers": {"proxy": provider},
             }
         ),
         encoding="utf-8",
     )
-    monkeypatch.setattr("llm.profiles.MODELS_CONFIG_PATH", path)
-    monkeypatch.setattr(
-        "llm.profiles.MODELS_JSON_CONFIG_PATH", tmp_path / "absent.json"
-    )
-    monkeypatch.setattr("app.cli.load_saved_config", lambda: {})
-    monkeypatch.setattr("app.cli.load_project_llm_defaults", lambda _: {})
+    monkeypatch.setattr("llm.profiles.MODELS_JSON_CONFIG_PATH", path)
     monkeypatch.setattr(
         "app.cli.SecretsVault", lambda: SimpleNamespace(get=lambda _: "fixture-secret")
     )
     events = []
-    old = build_llm_client({"profile_name": "old"}, project_root=tmp_path)
+    old = build_llm_client({"profile_name": "proxy:old"}, project_root=tmp_path)
     bridge = TuiBridge(
         project_root=tmp_path,
         data_root=tmp_path,
@@ -86,8 +82,8 @@ def test_shared_model_choice_rebuilds_real_client_and_preserves_previous(
     """真实配置切换经工厂进入后续输入，原客户端不变；参数：隔离根；返回：无。"""
     bridge, host, events = configured_bridge(tmp_path, monkeypatch)
     previous = host.config.llm_client
-    bridge.submit("/model profile use new")
-    assert load_model_profiles().active == "new"
+    bridge.submit("/model profile use proxy:new")
+    assert load_model_profiles().active == "proxy:new"
     assert public_model_config(host.config.llm_client)["model"] == "model-new"
     assert public_model_config(previous)["model"] == "model-old"
     assert host.config.llm_client is bridge.llm_client
@@ -114,8 +110,8 @@ def test_failed_reload_keeps_old_input_model_and_saved_state(tmp_path, monkeypat
         lambda: (_ for _ in ()).throw(OSError("fixture vault failure")),
     )
     with pytest.raises(RuntimeError, match="vault failure"):
-        bridge.submit("/model profile use new")
-    assert load_model_profiles().active == "old"
+        bridge.submit("/model profile use proxy:new")
+    assert load_model_profiles().active == "proxy:old"
     assert host.config.llm_client is previous and bridge.llm_client is previous
     assert not any(kind == "input-model" for kind, _ in events)
 
@@ -187,7 +183,7 @@ def test_settings_modal_preserves_draft_and_returns_explicit_shared_command():
 
     async def scenario():
         """运行真实Textual选择交互；参数：无；返回：无。"""
-        from textual.widgets import Button, Select
+        from textual.widgets import Button, Select, Static
 
         bridge = DisplayBridge()
         bridge.release.set()
@@ -203,6 +199,13 @@ def test_settings_modal_preserves_draft_and_returns_explicit_shared_command():
             }
             app.push_screen(SettingsScreen(data), app.settings_selected)
             await pilot.pause()
+            guidance = "\n".join(
+                str(widget.content) for widget in app.screen.query(Static)
+            )
+            assert "~/.reins/models.json" in guidance and "~/.reins/.env" in guidance
+            assert (
+                "models.yaml" not in guidance and "/model profile set" not in guidance
+            )
             app.screen.query_one("#mode-choice", Select).value = "read_only"
             app.screen.query_one("#apply-mode", Button).scroll_visible(immediate=True)
             app.screen.query_one("#apply-mode", Button).focus()

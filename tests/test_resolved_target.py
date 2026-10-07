@@ -6,11 +6,6 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from llm.config import (
-    ALLOWED_SAVED_KEYS,
-    load_saved_config,
-    save_user_config,
-)
 from llm.resolved_target import (
     CredentialResolutionError,
     infer_provider,
@@ -189,84 +184,3 @@ class TestCredentialResolution:
             )
 
         assert vault.get.call_count == 1
-
-
-class TestLoadSavedConfig:
-    def test_returns_empty_dict_when_file_missing(self, tmp_path):
-        result = load_saved_config(tmp_path / "config.yaml")
-        assert result == {}
-
-    def test_reads_llm_section_fields(self, tmp_path):
-        config_path = tmp_path / "config.yaml"
-        config_path.write_text(
-            "llm:\n  provider: openai\n  model: gpt-4o\n  base_url: https://api.openai.com/v1\n",
-            encoding="utf-8",
-        )
-        result = load_saved_config(config_path)
-        assert result["provider"] == "openai"
-        assert result["model"] == "gpt-4o"
-        assert result["base_url"] == "https://api.openai.com/v1"
-
-    def test_yaml_parse_error_returns_empty_dict(self, tmp_path, capsys):
-        config_path = tmp_path / "config.yaml"
-        config_path.write_text("llm:\n  invalid: [unclosed\n", encoding="utf-8")
-        result = load_saved_config(config_path)
-        assert result == {}
-        captured = capsys.readouterr()
-        assert "warning" in captured.err.lower()
-
-    def test_passes_through_auxiliary_models_field(self, tmp_path):
-        config_path = tmp_path / "config.yaml"
-        config_path.write_text(
-            "llm:\n  model: m\nauxiliary_models:\n  compress:\n    model: gpt-4o-mini\n",
-            encoding="utf-8",
-        )
-        result = load_saved_config(config_path)
-        assert "auxiliary_models" in result
-
-
-class TestSaveUserConfig:
-    def test_writes_only_allowed_keys(self, tmp_path):
-        config_path = tmp_path / "config.yaml"
-        save_user_config({"model": "gpt-4o", "provider": "openai"}, config_path)
-        content = config_path.read_text(encoding="utf-8")
-        assert "gpt-4o" in content
-        assert "openai" in content
-
-    def test_rejects_api_key_field(self, tmp_path):
-        config_path = tmp_path / "config.yaml"
-        with pytest.raises(ValueError, match="api_key"):
-            save_user_config({"api_key": "sk-secret"}, config_path)
-        assert not config_path.exists()
-
-    def test_accepts_supported_api_mode(self, tmp_path):
-        config_path = tmp_path / "config.yaml"
-        save_user_config({"api_mode": "anthropic_messages"}, config_path)
-        assert load_saved_config(config_path)["api_mode"] == "anthropic_messages"
-
-    def test_rejects_timeout_seconds_field(self, tmp_path):
-        config_path = tmp_path / "config.yaml"
-        with pytest.raises(ValueError, match="timeout_seconds"):
-            save_user_config({"timeout_seconds": 60}, config_path)
-
-    def test_partial_update_preserves_existing_keys(self, tmp_path):
-        config_path = tmp_path / "config.yaml"
-        save_user_config(
-            {"model": "old-model", "base_url": "http://old/v1"}, config_path
-        )
-        save_user_config({"model": "new-model"}, config_path)
-        result = load_saved_config(config_path)
-        assert result["model"] == "new-model"
-        assert result["base_url"] == "http://old/v1"
-
-    def test_allowed_saved_keys_constant(self):
-        assert ALLOWED_SAVED_KEYS == frozenset(
-            {
-                "provider",
-                "model",
-                "base_url",
-                "context_window",
-                "api_mode",
-                "max_output_tokens",
-            }
-        )

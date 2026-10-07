@@ -3,12 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from llm.client import RealLLMClient
-from llm.config import ALLOWED_SAVED_KEYS, save_user_config
 from llm.doctor import ModelDoctorReport, run_model_doctor
 from llm.profiles import (
-    ALLOWED_PROFILE_KEYS,
     load_model_profiles,
-    save_model_profile,
     switch_active_model_profile,
 )
 from llm.resolved_target import ResolvedModelTarget, sanitize_base_url
@@ -22,8 +19,6 @@ def handle_model_command(args: str, ctx: object) -> "SlashCommandResult":
     sub = sub.strip().lower()
     if not sub or sub == "show":
         return _result(_render_model_show(ctx))
-    if sub == "set":
-        return _model_set(rest.strip())
     if sub == "profile":
         return _model_profile(rest.strip())
     if sub == "doctor":
@@ -58,29 +53,6 @@ def _render_model_show(ctx: object) -> str:
     return "\n".join(lines)
 
 
-def _model_set(args: str) -> "SlashCommandResult":
-    if not args:
-        allowed = ", ".join(sorted(ALLOWED_SAVED_KEYS))
-        return _result(
-            f"Usage: /model set key=value [key=value ...]\nAllowed keys: {allowed}"
-        )
-    updates = _parse_updates(args)
-    if isinstance(updates, str):
-        return _result(updates)
-    rejected = [key for key in updates if key not in ALLOWED_SAVED_KEYS]
-    if rejected:
-        allowed = ", ".join(sorted(ALLOWED_SAVED_KEYS))
-        return _result(f"Key not allowed: {rejected[0]}. Allowed: {allowed}")
-    try:
-        save_user_config(updates)
-    except Exception as exc:
-        return _result(f"Failed to save config: {exc}")
-    saved_keys = ", ".join(f"{key}={value}" for key, value in updates.items())
-    return _pending_restart_result(
-        f"Saved: {saved_keys}\nPending restart: current REPL client is unchanged."
-    )
-
-
 def _model_profile(args: str) -> "SlashCommandResult":
     sub, _, rest = args.partition(" ")
     sub = sub.strip().lower()
@@ -88,8 +60,6 @@ def _model_profile(args: str) -> "SlashCommandResult":
         return _result(_render_profile_list())
     if sub == "show":
         return _result(_render_profile_show(rest.strip()))
-    if sub == "set":
-        return _profile_set(rest.strip())
     if sub == "use":
         return _profile_use(rest.strip())
     return _result(_profile_usage())
@@ -136,32 +106,13 @@ def _render_profile_show(name: str) -> str:
     return "\n".join(lines)
 
 
-def _profile_set(args: str) -> "SlashCommandResult":
-    name, _, rest = args.partition(" ")
-    if not name.strip() or not rest.strip():
-        return _result(_profile_usage())
-    updates = _parse_updates(rest.strip())
-    if isinstance(updates, str):
-        return _result(updates)
-    rejected = [key for key in updates if key not in ALLOWED_PROFILE_KEYS]
-    if rejected:
-        allowed = ", ".join(sorted(ALLOWED_PROFILE_KEYS))
-        return _result(f"Key not allowed: {rejected[0]}. Allowed: {allowed}")
-    try:
-        save_model_profile(name.strip(), updates)
-    except Exception as exc:
-        return _result(f"Failed to save profile: {exc}")
-    return _pending_restart_result(
-        f"Profile saved: {name.strip()}\n"
-        "Pending restart: current REPL client is unchanged."
-    )
-
-
 def _profile_use(args: str) -> "SlashCommandResult":
     """同时保存配置与可选强度；传参：命令参数；返回：生效待加载或明确失败。"""
     name, _, rest = args.partition(" ")
     if not name:
-        return _result("Usage: /model profile use <name> [reasoning_effort=value]")
+        return _result(
+            "Usage: /model profile use <provider:model> [reasoning_effort=value]"
+        )
     effort = None
     if rest.strip():
         updates = _parse_updates(rest.strip())
@@ -252,13 +203,13 @@ def _pending_restart_result(message: str) -> "SlashCommandResult":
 
 
 def _usage() -> str:
-    return "Usage: /model show | /model set key=value... | /model profile ... | /model doctor"
+    return "Usage: /model show | /model profile ... | /model doctor"
 
 
 def _profile_usage() -> str:
     return (
-        "Usage: /model profile list | show [name] | use <name> | "
-        "set <name> key=value..."
+        "Usage: /model profile list | show [provider:model] | "
+        "use <provider:model> [reasoning_effort=value]"
     )
 
 

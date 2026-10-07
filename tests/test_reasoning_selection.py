@@ -91,11 +91,23 @@ def test_only_documented_levels_are_selectable(model, values):
 
 def test_invalid_selection_does_not_change_file(tmp_path):
     """传参：临时目录；返回：无，错误强度不先切换活动模型。"""
-    path = tmp_path / "models.yaml"
-    text = "active: a\nprofiles:\n  a:\n    provider: proxy\n    model: glm-5.2\n    base_url: https://example.test\n"
+    path = tmp_path / "models.json"
+    text = json.dumps(
+        {
+            "active_provider": "proxy",
+            "active_model": "a",
+            "providers": {
+                "proxy": {
+                    "model_provider": "custom",
+                    "base_url": "https://example.test",
+                    "models": {"a": {"model": "glm-5.2"}},
+                }
+            },
+        }
+    )
     path.write_text(text, encoding="utf-8")
     with pytest.raises(ValueError, match="reasoning_effort"):
-        switch_active_model_profile("a", path, reasoning_effort="low")
+        switch_active_model_profile("proxy:a", path, reasoning_effort="low")
     assert path.read_text(encoding="utf-8") == text
 
 
@@ -167,8 +179,6 @@ def test_background_rebuild_honors_frozen_default(monkeypatch):
         reasoning_effort="max",
     )
     monkeypatch.setattr(cli, "_load_named_model_profile", lambda name: profile)
-    monkeypatch.setattr(cli, "load_project_llm_defaults", lambda root: {})
-    monkeypatch.setattr(cli, "load_saved_config", lambda: {})
     monkeypatch.setattr(
         cli, "SecretsVault", lambda: SimpleNamespace(get=lambda name: None)
     )
@@ -270,18 +280,30 @@ def test_reasoning_preamble_merges_only_with_matching_request():
 
 def test_failed_atomic_replace_preserves_original_selection(tmp_path, monkeypatch):
     """传参：临时目录和替换器；返回：无，文件替换失败不破坏原选择且清理临时文件。"""
-    import llm.profiles as profiles
+    import llm.model_catalog as catalog
 
-    path = tmp_path / "models.yaml"
-    original = "active: a\nprofiles:\n  a:\n    provider: proxy\n    model: glm-5.2\n    base_url: https://example.test\n"
+    path = tmp_path / "models.json"
+    original = json.dumps(
+        {
+            "active_provider": "proxy",
+            "active_model": "a",
+            "providers": {
+                "proxy": {
+                    "model_provider": "custom",
+                    "base_url": "https://example.test",
+                    "models": {"a": {"model": "glm-5.2"}},
+                }
+            },
+        }
+    )
     path.write_text(original, encoding="utf-8")
 
     def fail_replace(source, target):
         """传参：文件路径；返回：无，模拟Windows占用目标文件。"""
         raise PermissionError("locked")
 
-    monkeypatch.setattr(profiles.os, "replace", fail_replace)
+    monkeypatch.setattr(catalog.os, "replace", fail_replace)
     with pytest.raises(PermissionError, match="locked"):
-        switch_active_model_profile("a", path, reasoning_effort="max")
+        switch_active_model_profile("proxy:a", path, reasoning_effort="max")
     assert path.read_text(encoding="utf-8") == original
     assert list(tmp_path.iterdir()) == [path]

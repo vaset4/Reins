@@ -29,7 +29,7 @@ def test_classifies_blocked_tracked_artifacts(path: str, reason: str) -> None:
 @pytest.mark.parametrize(
     "path",
     [
-        "llm.example.json",
+        "models.example.json",
         "README.md",
         "runtime/run_evidence.py",
         ".trellis/tasks/archive/raw-model-evidence/prd.md",
@@ -44,7 +44,7 @@ def test_find_violations_returns_only_blocked_paths() -> None:
         [
             "README.md",
             ".reins/data/index.db",
-            "llm.example.json",
+            "models.example.json",
             "tools/__pycache__/terminal_tool.cpython-311.pyc",
         ]
     )

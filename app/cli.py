@@ -20,8 +20,6 @@ from llm.base import LLMClient
 from llm.client import MissingConfigurationLLMClient, RealLLMClient
 from llm.config import (
     LLMProviderConfig,
-    load_project_llm_defaults,
-    load_saved_config,
 )
 from llm.profiles import ModelProfile, load_model_profiles
 from llm.resolved_target import resolve_model_target
@@ -103,23 +101,18 @@ def build_llm_client(
     project_root: Path | None = None,
 ) -> LLMClient:
     """按共同配置优先级构造模型，定时任务可固定命名配置；传参：公开覆盖与项目根；返回：模型客户端。"""
-    resolved_root = project_root or Path(__file__).resolve().parent.parent
     profile_name = cli_overrides.get("profile_name")
     active_profile = (
         _load_named_model_profile(str(profile_name))
         if profile_name is not None
         else _load_active_model_profile()
     )
-    file_defaults = _merge_model_defaults(
-        load_project_llm_defaults(resolved_root),
-        active_profile,
-    )
+    file_defaults = active_profile.as_config() if active_profile is not None else {}
     model_overrides = (
         {**active_profile.as_config(), **cli_overrides}
         if profile_name is not None and active_profile is not None
         else cli_overrides
     )
-    saved = load_saved_config()
 
     try:
         vault: SecretsVault | None = SecretsVault()
@@ -128,7 +121,6 @@ def build_llm_client(
 
     target = resolve_model_target(
         cli_overrides=model_overrides,
-        saved_config=saved,
         file_defaults=file_defaults,
         secrets_vault=vault,
     )
@@ -280,17 +272,6 @@ def _load_named_model_profile(name: str) -> ModelProfile:
     if name not in profiles.profiles:
         raise ValueError(f"model profile not found: {name}")
     return profiles.profiles[name]
-
-
-def _merge_model_defaults(
-    legacy_defaults: dict[str, object],
-    active_profile: ModelProfile | None,
-) -> dict[str, object]:
-    if active_profile is None:
-        return legacy_defaults
-    merged = dict(legacy_defaults)
-    merged.update(active_profile.as_config())
-    return merged
 
 
 def _run_secret_command(args: argparse.Namespace) -> int:

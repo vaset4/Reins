@@ -236,17 +236,13 @@ def test_named_model_selection_does_not_follow_frontend_default(tmp_path, monkey
         "foreground-key",
     )
     profiles = ModelProfilesConfig(
-        tmp_path / "models.yaml",
+        tmp_path / "models.json",
         active="foreground",
         profiles={"scheduled": scheduled, "foreground": foreground},
     )
     vault = Mock()
     vault.get.return_value = "test-only-placeholder"
     monkeypatch.setattr(cli, "load_model_profiles", lambda: profiles)
-    monkeypatch.setattr(cli, "load_project_llm_defaults", lambda _: {})
-    monkeypatch.setattr(
-        cli, "load_saved_config", lambda: {"model": "other-saved-model"}
-    )
     monkeypatch.setattr(cli, "SecretsVault", lambda: vault)
     client = cli.build_llm_client({"profile_name": "scheduled"}, project_root=tmp_path)
     assert client.resolved_target.model == "scheduled-model"

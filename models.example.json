@@ -1,0 +1,19 @@
+{
+  "active_provider": "openai",
+  "active_model": "main",
+  "providers": {
+    "openai": {
+      "model_provider": "openai",
+      "base_url": "https://api.openai.com/v1",
+      "credential": "my_model_key",
+      "api_mode": "chat_completions",
+      "models": {
+        "main": {
+          "model": "YOUR_MODEL_ID",
+          "context_window": 30000,
+          "max_output_tokens": 4096
+        }
+      }
+    }
+  }
+}

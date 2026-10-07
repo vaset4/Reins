@@ -259,6 +259,9 @@ def test_real_llm_client_exposes_overflow_without_discarding_tool_evidence() -> 
 def test_cli_can_build_real_llm_client_from_config(monkeypatch) -> None:
     from app.cli import build_llm_client
 
+    monkeypatch.setattr("app.cli._load_active_model_profile", lambda: None)
+    monkeypatch.setattr("app.cli.SecretsVault", dict)
+
     monkeypatch.setenv("XIANGMU_LLM_BASE_URL", "http://localhost:11434/v1")
     monkeypatch.setenv("XIANGMU_LLM_MODEL", "local-model")
 
@@ -272,8 +275,6 @@ def test_cli_vault_initialization_failure_is_visible(monkeypatch) -> None:
 
     monkeypatch.setenv("XIANGMU_LLM_BASE_URL", "http://localhost:11434/v1")
     monkeypatch.setenv("XIANGMU_LLM_MODEL", "local-model")
-    monkeypatch.setattr(cli, "load_project_llm_defaults", lambda _root: {})
-    monkeypatch.setattr(cli, "load_saved_config", lambda: {})
     monkeypatch.setattr(cli, "_load_active_model_profile", lambda: None)
     monkeypatch.setattr(
         cli,
@@ -306,8 +307,7 @@ def test_cli_builds_client_from_active_models_json_profile(monkeypatch) -> None:
     )
 
     monkeypatch.setattr(cli, "load_model_profiles", lambda: profiles)
-    monkeypatch.setattr(cli, "load_project_llm_defaults", lambda _root: {})
-    monkeypatch.setattr(cli, "load_saved_config", lambda: {})
+    monkeypatch.setattr(cli, "SecretsVault", dict)
 
     client = cli.build_llm_client(cli_overrides={})
 

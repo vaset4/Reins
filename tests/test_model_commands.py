@@ -6,21 +6,15 @@ from app.repl.model_commands import handle_model_command
 from llm.resolved_target import ResolvedModelTarget
 
 
-def test_model_set_exposes_pending_restart_contract(monkeypatch) -> None:
-    saved: dict[str, object] = {}
-
-    def fake_save(updates: dict[str, object]) -> None:
-        saved.update(updates)
-
-    monkeypatch.setattr("app.repl.model_commands.save_user_config", fake_save)
-
-    result = handle_model_command("set model=next-model", object())
-
-    assert saved == {"model": "next-model"}
-    assert result.model_config_pending_restart is True
-    assert result.model_config_applied_to_active_client is False
-    assert result.message is not None
-    assert "current REPL client is unchanged" in result.message
+def test_retired_model_edit_commands_do_not_save(tmp_path, monkeypatch) -> None:
+    """传参：隔离目录；返回：无，旧编辑命令不创建配置并提示当前用法。"""
+    monkeypatch.chdir(tmp_path)
+    for command in ("set model=next-model", "profile set old model=next-model"):
+        result = handle_model_command(command, object())
+        assert "Usage:" in result.message
+        assert "set " not in result.message
+        assert not result.model_config_pending_restart
+    assert list(tmp_path.iterdir()) == []
 
 
 def test_model_profile_use_exposes_pending_restart_contract(monkeypatch) -> None:
@@ -30,9 +24,9 @@ def test_model_profile_use_exposes_pending_restart_contract(monkeypatch) -> None
         switched.append,
     )
 
-    result = handle_model_command("profile use fast", object())
+    result = handle_model_command("profile use proxy:fast", object())
 
-    assert switched == ["fast"]
+    assert switched == ["proxy:fast"]
     assert result.model_config_pending_restart is True
     assert result.model_config_applied_to_active_client is False
     assert result.message is not None
