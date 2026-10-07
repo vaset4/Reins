@@ -1,0 +1,7 @@
+{"kind":"response_start","sequence":0,"message_id":"chat-tool"}
+{"kind":"content_start","sequence":1,"block_id":"tool:0","content_kind":"tool_call","call_id":"c1","tool_name":"read"}
+{"kind":"content_delta","sequence":2,"block_id":"tool:0","delta":"{\"path\":"}
+{"kind":"content_delta","sequence":3,"block_id":"tool:0","delta":"\"a.txt\"}"}
+{"kind":"usage_update","sequence":4,"input_tokens":2,"output_tokens":1,"total_tokens":3,"cache_read_input_tokens":0}
+{"kind":"content_end","sequence":5,"block_id":"tool:0"}
+{"kind":"response_done","sequence":6,"stop_reason":"tool_call"}

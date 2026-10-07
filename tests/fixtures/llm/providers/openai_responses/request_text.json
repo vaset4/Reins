@@ -1,0 +1,1 @@
+{"model":"gpt-fixture","instructions":"You are Reins.","input":[{"role":"user","content":[{"type":"input_text","text":"hello"}]}],"stream":true}

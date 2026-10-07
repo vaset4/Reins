@@ -1,0 +1,19 @@
+servers:
+  filesystem:
+    command: ["npx", "-y", "@modelcontextprotocol/server-filesystem", "~/.reins/data"]
+    transport: stdio
+    env: {}
+    tool_risk_overrides:
+      read_file: confirm
+      write_file: confirm
+      delete_file: deny
+  time:
+    command: ["npx", "-y", "@modelcontextprotocol/server-time"]
+    transport: stdio
+    env: {}
+    tool_risk_overrides: {}
+  # github:
+  #   command: ["npx", "-y", "@modelcontextprotocol/server-github"]
+  #   transport: stdio
+  #   env:
+  #     GITHUB_PERSONAL_ACCESS_TOKEN: ${secret:GITHUB_TOKEN}

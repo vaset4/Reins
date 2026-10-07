@@ -1,0 +1,12 @@
+{
+  "api_family": "openai_responses",
+  "sdk_package": "openai",
+  "sdk_version": "3.2.0",
+  "source_url": "https://github.com/openai/openai-python/tree/v3.2.0/src/openai/types/responses",
+  "source_tag": "v3.2.0",
+  "captured_at": "2026-08-19",
+  "fixture_kind": "synthetic_provider_protocol_golden",
+  "contains_secrets": false,
+  "raw_event_types": ["response.created", "response.output_item.added", "response.output_item.done", "response.output_text.delta", "response.output_text.done", "response.reasoning_text.delta", "response.reasoning_text.done", "response.function_call_arguments.delta", "response.function_call_arguments.done", "response.completed", "response.failed", "response.incomplete"],
+  "redaction": "synthetic fixture values only"
+}

@@ -1,0 +1,121 @@
+.evidence-drawer {
+  border-left: 1px solid var(--line);
+}
+
+.drawer-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(10px);
+}
+
+.drawer-header h2 {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+.drawer-actions {
+  gap: 8px;
+}
+
+.evidence-body {
+  padding: 14px;
+}
+
+.evidence-tabs {
+  position: sticky;
+  top: 69px;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  background: var(--surface);
+}
+
+.evidence-tab {
+  flex: 0 0 auto;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fbfcfa;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.evidence-tab.active {
+  color: var(--green);
+  background: var(--green-soft);
+  border-color: #a3cfae;
+}
+
+.evidence-tab-panel {
+  min-height: 260px;
+}
+
+.code-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.code-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.code-block {
+  min-height: 160px;
+  max-height: calc(100vh - 230px);
+  margin: 0;
+  padding: 12px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fbfcfa;
+  color: #273027;
+  font: 12px/1.62 var(--mono);
+}
+
+.message-list {
+  display: grid;
+  gap: 10px;
+}
+
+.message-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fbfcfa;
+}
+
+.message-card h4 {
+  margin: 0;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  color: var(--green);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.message-card .code-block {
+  max-height: 320px;
+  border: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+@media (max-width: 1180px) {
+  .evidence-tabs { top: 62px; }
+  .code-block { max-height: 36vh; }
+}

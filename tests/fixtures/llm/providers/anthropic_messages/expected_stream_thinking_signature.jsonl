@@ -1,0 +1,7 @@
+{"kind":"response_start","sequence":0,"message_id":"msg-1"}
+{"kind":"usage_update","sequence":1,"input_tokens":0,"output_tokens":0}
+{"kind":"content_start","sequence":2,"block_id":"block:0","content_kind":"tool_call","call_id":"c1","tool_name":"read"}
+{"kind":"content_delta","sequence":3,"block_id":"block:0","delta":"{\"path\":\"a.txt\"}"}
+{"kind":"content_end","sequence":4,"block_id":"block:0"}
+{"kind":"usage_update","sequence":5,"output_tokens":1,"cache_read_input_tokens":0,"cache_write_input_tokens":2}
+{"kind":"response_done","sequence":6,"stop_reason":"tool_call"}

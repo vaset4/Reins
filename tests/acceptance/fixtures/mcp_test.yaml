@@ -1,0 +1,16 @@
+servers:
+  echo:
+    command: ["python", "tests/fixtures/standard_mcp_server.py"]
+    transport: stdio
+  filesystem:
+    command: ["python", "tests/fixtures/standard_mcp_server.py"]
+    transport: stdio
+    tools:
+      read_file:
+        description: Mock filesystem read.
+        inputSchema:
+          type: object
+          properties:
+            filePath:
+              type: string
+          required: [filePath]

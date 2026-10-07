@@ -1,0 +1,6 @@
+{"kind":"response_start","sequence":0,"message_id":"chat-1"}
+{"kind":"content_start","sequence":1,"block_id":"text:0","content_kind":"text"}
+{"kind":"content_delta","sequence":2,"block_id":"text:0","delta":"hi"}
+{"kind":"usage_update","sequence":3,"input_tokens":0,"output_tokens":1,"cache_read_input_tokens":0}
+{"kind":"content_end","sequence":4,"block_id":"text:0"}
+{"kind":"response_done","sequence":5,"stop_reason":"end_turn"}

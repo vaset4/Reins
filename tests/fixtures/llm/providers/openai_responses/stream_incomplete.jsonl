@@ -1,0 +1,2 @@
+{"type":"response.created","sequence_number":0,"response":{"id":"resp-incomplete","created_at":1,"model":"gpt-fixture","object":"response","output":[],"parallel_tool_calls":false,"tool_choice":"auto","tools":[],"status":"in_progress"}}
+{"type":"response.incomplete","sequence_number":1,"response":{"id":"resp-incomplete","created_at":1,"model":"gpt-fixture","object":"response","output":[],"parallel_tool_calls":false,"tool_choice":"auto","tools":[],"status":"incomplete","incomplete_details":{"reason":"max_output_tokens"}}}

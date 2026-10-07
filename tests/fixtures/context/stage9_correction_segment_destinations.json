@@ -1,0 +1,292 @@
+{
+  "provenance": {
+    "case": "correction",
+    "model": "deepseek-v4.1-flash",
+    "generation_request_id": "request-01M3V6D6SM7GRFC78W1HR01ZJN",
+    "audit_request_id": "request-01M3V6DSC1N1PA93NHS4SZ7R6S",
+    "files": [
+      {
+        "path": ".tmp/stage9-real-probe-20261001/correction-1-candidate/calls/call-001/call.json",
+        "sha256": "badfcb52d670c210aa85885b34367ea24ef19a8b7c636f2f923608713b03b89a"
+      },
+      {
+        "path": ".tmp/stage9-real-probe-20261001/correction-1-candidate/calls/call-002/call.json",
+        "sha256": "1de23d2d44f0a555c69d5825410ac8003cadb7b4d5de0966c91209d9c0a56165"
+      },
+      {
+        "path": ".tmp/stage9-real-probe-20261001/correction-1-candidate/calls/call-002/attempt-e61796bc869048d6ba5d6ea3ecefb556-started.json",
+        "sha256": "b0cba185bf7e4eea3fca83ae3ae284aac7dbcc5b405b7cb1df1ddb8ffbdf522f"
+      }
+    ]
+  },
+  "base_summary_id": null,
+  "required_message_ids": [
+    "msg-01M3V6D5RAAWACJ4B52YYRR4DG",
+    "msg-01M3V6D5SMMMMGN7DTTV46YS4F",
+    "msg-01M3V6D5TXBHGT3WHX4E8PEANW",
+    "msg-01M3V6D5W76RRK8472Q2M0K7BQ",
+    "msg-01M3V6D5XH9NQPJVCCJA55PTH9"
+  ],
+  "original_groups": [
+    [
+      {
+        "kind": "user",
+        "message_id": "msg-01M3V6D5RAAWACJ4B52YYRR4DG",
+        "content": [
+          {
+            "kind": "text",
+            "text": "给个人笔记选择数据库，先考虑云端A。",
+            "reference_ids": []
+          }
+        ],
+        "source_kind": "user_input"
+      }
+    ],
+    [
+      {
+        "kind": "assistant",
+        "message_id": "msg-01M3V6D5SMMMMGN7DTTV46YS4F",
+        "content": [
+          {
+            "kind": "text",
+            "text": "有两个备选：第一是云端A，第二是本地SQLite。后者可以完全离线。",
+            "reference_ids": []
+          }
+        ],
+        "stop_reason": "end_turn",
+        "provider_state": null,
+        "usage": null,
+        "source_kind": "assistant"
+      }
+    ],
+    [
+      {
+        "kind": "user",
+        "message_id": "msg-01M3V6D5TXBHGT3WHX4E8PEANW",
+        "content": [
+          {
+            "kind": "text",
+            "text": "改成第二个，数据留本地；云端方案不要用了。",
+            "reference_ids": []
+          }
+        ],
+        "source_kind": "user_input"
+      }
+    ],
+    [
+      {
+        "kind": "assistant",
+        "message_id": "msg-01M3V6D5W76RRK8472Q2M0K7BQ",
+        "content": [
+          {
+            "kind": "text",
+            "text": "接下来比较导入方式，尚未导入。",
+            "reference_ids": []
+          }
+        ],
+        "stop_reason": "end_turn",
+        "provider_state": null,
+        "usage": null,
+        "source_kind": "assistant"
+      }
+    ],
+    [
+      {
+        "kind": "assistant",
+        "message_id": "msg-01M3V6D5XH9NQPJVCCJA55PTH9",
+        "content": [
+          {
+            "kind": "text",
+            "text": "附件页0：这是已完成目录核对的过程说明，没有新增操作或决定。附件页0：这是已完成目录核对的过程说明，没有新增操作或决定。附件页0：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页1：这是已完成目录核对的过程说明，没有新增操作或决定。附件页1：这是已完成目录核对的过程说明，没有新增操作或决定。附件页1：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页2：这是已完成目录核对的过程说明，没有新增操作或决定。附件页2：这是已完成目录核对的过程说明，没有新增操作或决定。附件页2：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页3：这是已完成目录核对的过程说明，没有新增操作或决定。附件页3：这是已完成目录核对的过程说明，没有新增操作或决定。附件页3：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页4：这是已完成目录核对的过程说明，没有新增操作或决定。附件页4：这是已完成目录核对的过程说明，没有新增操作或决定。附件页4：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页5：这是已完成目录核对的过程说明，没有新增操作或决定。附件页5：这是已完成目录核对的过程说明，没有新增操作或决定。附件页5：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页6：这是已完成目录核对的过程说明，没有新增操作或决定。附件页6：这是已完成目录核对的过程说明，没有新增操作或决定。附件页6：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页7：这是已完成目录核对的过程说明，没有新增操作或决定。附件页7：这是已完成目录核对的过程说明，没有新增操作或决定。附件页7：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页8：这是已完成目录核对的过程说明，没有新增操作或决定。附件页8：这是已完成目录核对的过程说明，没有新增操作或决定。附件页8：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页9：这是已完成目录核对的过程说明，没有新增操作或决定。附件页9：这是已完成目录核对的过程说明，没有新增操作或决定。附件页9：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页10：这是已完成目录核对的过程说明，没有新增操作或决定。附件页10：这是已完成目录核对的过程说明，没有新增操作或决定。附件页10：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页11：这是已完成目录核对的过程说明，没有新增操作或决定。附件页11：这是已完成目录核对的过程说明，没有新增操作或决定。附件页11：这是已完成目录核对的过程说明，没有新增操作或决定。",
+            "reference_ids": []
+          }
+        ],
+        "stop_reason": "end_turn",
+        "provider_state": null,
+        "usage": null,
+        "source_kind": "assistant"
+      }
+    ]
+  ],
+  "generation": {
+    "base_summary_id": null,
+    "add": [
+      {
+        "entry_id": "note-db-req-01",
+        "kind": "requirement",
+        "text": "用户目标：为个人笔记选择数据库，起初要求先考虑云端A（该初选已被其后用户改选取代）。",
+        "sources": [
+          {
+            "message_id": "msg-01M3V6D5RAAWACJ4B52YYRR4DG",
+            "quote": "给个人笔记选择数据库，先考虑云端A。"
+          }
+        ],
+        "scope": "个人笔记数据库选型"
+      },
+      {
+        "entry_id": "note-db-obs-02",
+        "kind": "observation",
+        "text": "助理列出两个备选：第一是云端A，第二是本地SQLite；后者可完全离线。",
+        "sources": [
+          {
+            "message_id": "msg-01M3V6D5SMMMMGN7DTTV46YS4F",
+            "quote": "有两个备选：第一是云端A，第二是本地SQLite。后者可以完全离线。"
+          }
+        ],
+        "scope": "个人笔记数据库选型"
+      },
+      {
+        "entry_id": "note-db-dec-03",
+        "kind": "decision",
+        "text": "用户改选第二个方案：数据留在本地；云端方案不要再用。",
+        "sources": [
+          {
+            "message_id": "msg-01M3V6D5TXBHGT3WHX4E8PEANW",
+            "quote": "改成第二个，数据留本地；云端方案不要用了。"
+          }
+        ],
+        "scope": "个人笔记数据库选型"
+      },
+      {
+        "entry_id": "note-db-open-04",
+        "kind": "open",
+        "text": "助理称接下来比较导入方式；明确尚未导入（未执行，非结果）。",
+        "sources": [
+          {
+            "message_id": "msg-01M3V6D5W76RRK8472Q2M0K7BQ",
+            "quote": "接下来比较导入方式，尚未导入。"
+          }
+        ],
+        "scope": "个人笔记数据导入方式"
+      },
+      {
+        "entry_id": "note-db-obs-05",
+        "kind": "observation",
+        "text": "附件页0–11仅为已完成目录核对的过程说明，没有新增操作或决定，未提供新增事实或执行证据。",
+        "sources": [
+          {
+            "message_id": "msg-01M3V6D5XH9NQPJVCCJA55PTH9",
+            "quote": "附件页0：这是已完成目录核对的过程说明，没有新增操作或决定。"
+          }
+        ],
+        "scope": "附件：已完成目录核对说明"
+      }
+    ],
+    "dispositions": [
+      {
+        "message_id": "msg-01M3V6D5RAAWACJ4B52YYRR4DG",
+        "destinations": [
+          "note-db-req-01"
+        ],
+        "reason": "用户提出笔记数据库选型的初始要求，需保留原话"
+      },
+      {
+        "message_id": "msg-01M3V6D5SMMMMGN7DTTV46YS4F",
+        "destinations": [
+          "note-db-obs-02"
+        ],
+        "reason": "助理给出的两方案与离线属性，作为后续改选的依据"
+      },
+      {
+        "message_id": "msg-01M3V6D5TXBHGT3WHX4E8PEANW",
+        "destinations": [
+          "note-db-dec-03"
+        ],
+        "reason": "用户明确改为本地、弃用云端的当前有效决定"
+      },
+      {
+        "message_id": "msg-01M3V6D5W76RRK8472Q2M0K7BQ",
+        "destinations": [
+          "note-db-open-04"
+        ],
+        "reason": "仅表示下一步比较导入方式且尚未导入，记为未决事项"
+      },
+      {
+        "message_id": "msg-01M3V6D5XH9NQPJVCCJA55PTH9",
+        "destinations": [
+          "note-db-obs-05"
+        ],
+        "reason": "附件多页重复且自述无新增操作或决定，仅作观察记录"
+      }
+    ],
+    "findings": [
+      {
+        "message_id": "msg-01M3V6D5XH9NQPJVCCJA55PTH9",
+        "detail": "附件页0–11文字重复，均为已完成目录核对的过程说明；不含新增操作、决定或执行证据，不能视为导入或选型结果。"
+      },
+      {
+        "message_id": "msg-01M3V6D5W76RRK8472Q2M0K7BQ",
+        "detail": "属计划性陈述，非执行结果；后续导入状态仍未知。"
+      }
+    ],
+    "segments": [
+      {
+        "segment_id": "seg-notedb-01",
+        "title": "个人笔记数据库选型：弃用云端A、改用本地SQLite，导入方式待比较",
+        "message_ids": [
+          "msg-01M3V6D5RAAWACJ4B52YYRR4DG",
+          "msg-01M3V6D5SMMMMGN7DTTV46YS4F",
+          "msg-01M3V6D5TXBHGT3WHX4E8PEANW",
+          "msg-01M3V6D5W76RRK8472Q2M0K7BQ",
+          "msg-01M3V6D5XH9NQPJVCCJA55PTH9"
+        ],
+        "p1": "用户提出要为个人笔记选择数据库，初始要求先考虑云端A。助理回应给出两个备选：第一是云端A，第二是本地SQLite，并说明本地SQLite可以完全离线。用户随后改选第二个方案，要求数据留在本地，并明确云端方案不要再用。助理接着表示下一步是比较导入方式，且明确尚未导入。另有一份附件，包含页0至页11的说明，内容重复且自称是“已完成目录核对的过程说明，没有新增操作或决定”，未给出任何新的操作、决定或执行证据。",
+        "p2": "笔记数据库选型：初选云端A → 助理给出云端A与本地SQLite两备选（本地可完全离线）→ 用户改选本地SQLite、数据留本地、弃用云端 → 助理拟比较导入方式（尚未导入）→ 附件页0–11仅为已完成的目录核对说明，无新增操作或决定。",
+        "p3": "当前有效决定：个人笔记用第二个方案即本地SQLite，数据留本地，云端方案不再使用。未决事项：导入方式的比较尚未进行，且尚未导入。附件仅重复说明已完成目录核对，无新增操作或决定，也未确认任何执行结果。",
+        "p4": "个人笔记；数据库选型；云端A；本地SQLite；完全离线；数据留本地；导入方式；尚未导入；附件页0–11；目录核对",
+        "scope": "个人笔记数据库选型与数据导入"
+      }
+    ]
+  },
+  "audit": {
+    "base_summary_id": null,
+    "dispositions": [
+      {
+        "message_id": "msg-01M3V6D5RAAWACJ4B52YYRR4DG",
+        "destinations": [
+          "note-db-req-01",
+          "seg-notedb-01"
+        ],
+        "reason": "用户初始要求已由需求条目承接，且属于既有段seg-notedb-01的起始原文"
+      },
+      {
+        "message_id": "msg-01M3V6D5SMMMMGN7DTTV46YS4F",
+        "destinations": [
+          "note-db-obs-02",
+          "seg-notedb-01"
+        ],
+        "reason": "助理列出两个备选的观察已记录，并属该段过程原文"
+      },
+      {
+        "message_id": "msg-01M3V6D5TXBHGT3WHX4E8PEANW",
+        "destinations": [
+          "note-db-dec-03",
+          "seg-notedb-01"
+        ],
+        "reason": "用户改选本地、弃用云端的决定已记录，并属该段关键决定原文"
+      },
+      {
+        "message_id": "msg-01M3V6D5W76RRK8472Q2M0K7BQ",
+        "destinations": [
+          "note-db-open-04",
+          "seg-notedb-01"
+        ],
+        "reason": "尚未导入、拟比较导入方式的未决事项已记录，并属该段原文"
+      },
+      {
+        "message_id": "msg-01M3V6D5XH9NQPJVCCJA55PTH9",
+        "destinations": [
+          "note-db-obs-05",
+          "seg-notedb-01"
+        ],
+        "reason": "附件仅为目录核对过程说明、无新增操作或决定的观察已记录，并属该段末尾原文"
+      }
+    ],
+    "findings": [
+      {
+        "message_id": "msg-01M3V6D5XH9NQPJVCCJA55PTH9",
+        "detail": "逐档核对：原文附件页0至页11每页都将同一句“这是已完成目录核对的过程说明，没有新增操作或决定。”重复三遍，内容完全一致；候选条目note-db-obs-05与seg-notedb-01的表述（页0–11仅有过程说明、无新增操作或决定）与原文一致，仅未提及重复三遍这一排版细节，不影响结论，无需修订。"
+      }
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+Screen { background: #10161d; color: #dae2eb; }
+#heading { height: 2; padding: 0 1; background: #1d2935; color: #80d8c0; }
+#workspace, #chat { height: 1fr; }
+#history-actions { height: 3; padding: 0 1; }
+#history-actions Button { min-width: 8; margin-right: 1; }
+#history-caption { height: 1; padding: 0 1; color: #a6b6c5; }
+#sidebar { width: 38; max-width: 45%; padding: 0 1; border-right: solid #354452; }
+#sidebar.narrow { width: 45%; }
+#sidebar Button { width: 100%; }
+#workspace-filter { width: 100%; margin: 0; }
+#workspace-filter-path { height: 1; overflow-x: auto; color: #a6b6c5; }
+#sidebar-tools { height: auto; max-height: 12; overflow-y: auto; border: none; padding: 0; margin: 0; }
+.sidebar-actions { height: 3; }
+.sidebar-actions Button { width: 1fr; min-width: 8; }
+#sidebar.narrow .sidebar-actions, #sidebar.narrow #session-pages,
+#sidebar.compact .sidebar-actions, #sidebar.compact #session-pages { height: 1; }
+#sidebar.narrow .sidebar-actions Button, #sidebar.narrow #session-pages Button,
+#sidebar.compact .sidebar-actions Button, #sidebar.compact #session-pages Button {
+    height: 1; border: none; padding: 0 1;
+}
+#sessions { height: 1fr; }
+#session-pages { height: 3; }
+#session-pages Button { width: 1fr; min-width: 8; }
+#conversation { height: 1fr; padding: 0 2; }
+#composer { height: auto; min-height: 3; max-height: 9; margin: 0 1; border: solid #80d8c0; }
+#command-hints { display: none; height: auto; max-height: 6; margin: 0 1; padding: 0 1; background: #1d2935; }
+#command-hints-body { height: 5; border: none; padding: 0; }
+#status { height: 1; padding: 0 1; color: #a6b6c5; }
+#input-hints { height: auto; max-height: 3; padding: 0 1; color: #a6b6c5; }
+#notice { height: auto; max-height: 5; padding: 0 1; color: #e9c780; }
+.message-card { height: auto; margin-bottom: 1; }
+.message-author { height: 1; color: #80d8c0; text-style: bold; }
+.card-requests { height: 1; min-width: 8; width: auto; border: none; background: transparent; color: #a6b6c5; }
+.card-restore { height: 1; min-width: 8; width: auto; border: none; background: transparent; color: #a6b6c5; }
+.user-card { background: #1c2935; padding: 1; }
+.message-body, .tool-args, .tool-output { height: auto; }
+.tool-args { color: #a6b6c5; }
+.tool-details, .reasoning { height: auto; }
+ModalScreen { align: center middle; background: #000000 55%; }
+.dialog { width: 85%; max-width: 110; height: auto; max-height: 85%; padding: 1 2; border: solid #80d8c0; background: #18232e; }
+.dialog-title { height: auto; margin-bottom: 1; text-style: bold; }
+.dialog-body { height: auto; max-height: 22; }
+.dialog-actions { height: auto; }
+.dialog-actions Button { min-width: 10; margin-right: 1; }
+.activity-dialog { height: 85%; }
+.activity-dialog .dialog-body { height: 1fr; }
+.branch-dialog { height: 92%; max-height: 96%; width: 96%; max-width: 100%; }
+#branch-content { height: 1fr; }
+#branch-tree { width: 100%; }
+#branch-history { width: 60%; padding: 0 1; }

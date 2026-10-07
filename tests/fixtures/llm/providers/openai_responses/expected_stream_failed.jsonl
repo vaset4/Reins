@@ -1,0 +1,2 @@
+{"kind":"response_start","sequence":0,"message_id":"resp-fail"}
+{"kind":"response_error","sequence":1,"error_category":"provider_error"}

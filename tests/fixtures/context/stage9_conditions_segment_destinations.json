@@ -1,0 +1,201 @@
+{
+  "provenance": {
+    "case": "conditions",
+    "model": "deepseek-v4.1-flash",
+    "generation_request_id": "request-01M3V6AATPZQ1SNP57F6777SE3",
+    "audit_request_id": "request-01M3V6BM824B9QYK788ZMY4GVT",
+    "files": [
+      {
+        "path": ".tmp/stage9-real-probe-20261001/conditions-1-candidate/calls/call-001/call.json",
+        "sha256": "c324c9a077533220afde5018f92a0aecd98c92fbd91c02f52e3f38f42081ce8d"
+      },
+      {
+        "path": ".tmp/stage9-real-probe-20261001/conditions-1-candidate/calls/call-002/call.json",
+        "sha256": "02b7beb722cceb7ab3c3211bb2f91d0794461bc9e0a75b39fa4cf6016b8cc3be"
+      },
+      {
+        "path": ".tmp/stage9-real-probe-20261001/conditions-1-candidate/calls/call-002/attempt-ff581280a442498f888eafeaf3b9458c-started.json",
+        "sha256": "7bb3c7be075776c1aaf93acab4b54b0c2f911b98de93400f1758fbe3fbb2027b"
+      }
+    ]
+  },
+  "base_summary_id": null,
+  "required_message_ids": [
+    "msg-01M3V6A9Z6DZW7HR689HYHCPE1",
+    "msg-01M3V6AA0BC6NGW4Z57696FX6B",
+    "msg-01M3V6AA1KT2XPDEXRWAVEP06W"
+  ],
+  "original_groups": [
+    [
+      {
+        "kind": "user",
+        "message_id": "msg-01M3V6A9Z6DZW7HR689HYHCPE1",
+        "content": [
+          {
+            "kind": "text",
+            "text": "整理本地资料，总费用最多500元。不要上传原文，也不要联网。只有本地离线格式转换费可以先付，且单项不得超过80元；其他费用先询问。",
+            "reference_ids": []
+          }
+        ],
+        "source_kind": "user_input"
+      }
+    ],
+    [
+      {
+        "kind": "assistant",
+        "message_id": "msg-01M3V6AA0BC6NGW4Z57696FX6B",
+        "content": [
+          {
+            "kind": "text",
+            "text": "已查看文件目录，还没有执行转换或支付。",
+            "reference_ids": []
+          }
+        ],
+        "stop_reason": "end_turn",
+        "provider_state": null,
+        "usage": null,
+        "source_kind": "assistant"
+      }
+    ],
+    [
+      {
+        "kind": "assistant",
+        "message_id": "msg-01M3V6AA1KT2XPDEXRWAVEP06W",
+        "content": [
+          {
+            "kind": "text",
+            "text": "附件页0：这是已完成目录核对的过程说明，没有新增操作或决定。附件页0：这是已完成目录核对的过程说明，没有新增操作或决定。附件页0：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页1：这是已完成目录核对的过程说明，没有新增操作或决定。附件页1：这是已完成目录核对的过程说明，没有新增操作或决定。附件页1：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页2：这是已完成目录核对的过程说明，没有新增操作或决定。附件页2：这是已完成目录核对的过程说明，没有新增操作或决定。附件页2：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页3：这是已完成目录核对的过程说明，没有新增操作或决定。附件页3：这是已完成目录核对的过程说明，没有新增操作或决定。附件页3：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页4：这是已完成目录核对的过程说明，没有新增操作或决定。附件页4：这是已完成目录核对的过程说明，没有新增操作或决定。附件页4：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页5：这是已完成目录核对的过程说明，没有新增操作或决定。附件页5：这是已完成目录核对的过程说明，没有新增操作或决定。附件页5：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页6：这是已完成目录核对的过程说明，没有新增操作或决定。附件页6：这是已完成目录核对的过程说明，没有新增操作或决定。附件页6：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页7：这是已完成目录核对的过程说明，没有新增操作或决定。附件页7：这是已完成目录核对的过程说明，没有新增操作或决定。附件页7：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页8：这是已完成目录核对的过程说明，没有新增操作或决定。附件页8：这是已完成目录核对的过程说明，没有新增操作或决定。附件页8：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页9：这是已完成目录核对的过程说明，没有新增操作或决定。附件页9：这是已完成目录核对的过程说明，没有新增操作或决定。附件页9：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页10：这是已完成目录核对的过程说明，没有新增操作或决定。附件页10：这是已完成目录核对的过程说明，没有新增操作或决定。附件页10：这是已完成目录核对的过程说明，没有新增操作或决定。\n附件页11：这是已完成目录核对的过程说明，没有新增操作或决定。附件页11：这是已完成目录核对的过程说明，没有新增操作或决定。附件页11：这是已完成目录核对的过程说明，没有新增操作或决定。",
+            "reference_ids": []
+          }
+        ],
+        "stop_reason": "end_turn",
+        "provider_state": null,
+        "usage": null,
+        "source_kind": "assistant"
+      }
+    ]
+  ],
+  "generation": {
+    "base_summary_id": null,
+    "add": [
+      {
+        "entry_id": "req-001",
+        "kind": "requirement",
+        "text": "整理本地资料；总费用最多500元；不要上传原文，也不要联网；仅本地离线格式转换费可先付，且单项不得超过80元；其他费用先询问。",
+        "sources": [
+          {
+            "message_id": "msg-01M3V6A9Z6DZW7HR689HYHCPE1",
+            "quote": "整理本地资料，总费用最多500元。不要上传原文，也不要联网。只有本地离线格式转换费可以先付，且单项不得超过80元；其他费用先询问。"
+          }
+        ],
+        "scope": "本地资料整理；费用与网络限制"
+      },
+      {
+        "entry_id": "res-001",
+        "kind": "result",
+        "text": "已查看文件目录；尚未执行转换或支付。",
+        "sources": [
+          {
+            "message_id": "msg-01M3V6AA0BC6NGW4Z57696FX6B",
+            "quote": "已查看文件目录，还没有执行转换或支付。"
+          }
+        ],
+        "scope": "本地资料整理任务；目录核对阶段"
+      },
+      {
+        "entry_id": "con-001",
+        "kind": "conclusion",
+        "text": "附件页0-11均为已完成目录核对的过程说明，未新增操作或决定。",
+        "sources": [
+          {
+            "message_id": "msg-01M3V6AA1KT2XPDEXRWAVEP06W",
+            "quote": "附件页0：这是已完成目录核对的过程说明，没有新增操作或决定。"
+          }
+        ],
+        "scope": "附件页0-11"
+      }
+    ],
+    "dispositions": [
+      {
+        "message_id": "msg-01M3V6A9Z6DZW7HR689HYHCPE1",
+        "destinations": [
+          "req-001"
+        ],
+        "reason": "用户提出整理本地资料及费用/网络限制，归入需求条目"
+      },
+      {
+        "message_id": "msg-01M3V6AA0BC6NGW4Z57696FX6B",
+        "destinations": [
+          "res-001"
+        ],
+        "reason": "助理报告目录查看与未执行转换/支付的当前结果"
+      },
+      {
+        "message_id": "msg-01M3V6AA1KT2XPDEXRWAVEP06W",
+        "destinations": [
+          "con-001"
+        ],
+        "reason": "助理公开说明附件页0-11为目录核对过程说明，无新增操作或决定"
+      }
+    ],
+    "segments": [
+      {
+        "segment_id": "seg-001",
+        "title": "本地资料整理与费用限制",
+        "message_ids": [
+          "msg-01M3V6A9Z6DZW7HR689HYHCPE1",
+          "msg-01M3V6AA0BC6NGW4Z57696FX6B",
+          "msg-01M3V6AA1KT2XPDEXRWAVEP06W"
+        ],
+        "p1": "用户要求整理本地资料，并设定总费用最多500元；不得上传原文或联网；只有本地离线格式转换费可先付，且单项不得超过80元，其他费用需先询问。助理回复已查看文件目录，尚未执行转换或支付。附件页0-11均为已完成目录核对的过程说明，没有新增操作或决定。",
+        "p2": "用户要求整理本地资料并设费用/网络限制：总费用≤500元、禁止上传原文/联网、仅本地离线格式转换费可预付且单项≤80元、其他费用先询问。助理已查目录，未执行转换或支付；附件页0-11无新增操作/决定。",
+        "p3": "条件：总费用≤500元；禁止上传原文或联网；仅本地离线格式转换费可先付且单项≤80元；其他费用先询问。现状：已查看文件目录，尚未执行转换或支付；附件页0-11无新增操作或决定。未决：资料整理/转换尚未执行，后续操作需遵守上述限制。",
+        "p4": "本地资料整理；费用上限500元；禁止上传原文/联网；离线格式转换费≤80元；目录核对；未执行转换或支付；附件页0-11",
+        "scope": "本地离线资料整理；费用与网络限制；附件页0-11"
+      }
+    ]
+  },
+  "audit": {
+    "base_summary_id": null,
+    "dispositions": [
+      {
+        "message_id": "msg-01M3V6A9Z6DZW7HR689HYHCPE1",
+        "destinations": [
+          "req-001",
+          "seg-001"
+        ],
+        "reason": "该用户原文逐字支持已存的费用与网络限制条目的全部数字与例外，并已由现有分段完整覆盖，无新增信息可另立条目。"
+      },
+      {
+        "message_id": "msg-01M3V6AA0BC6NGW4Z57696FX6B",
+        "destinations": [
+          "res-001",
+          "seg-001"
+        ],
+        "reason": "该助理原文仅陈述已查看目录、未执行转换或支付，与既有结果条目及分段一致，不改变状态为成功。"
+      },
+      {
+        "message_id": "msg-01M3V6AA1KT2XPDEXRWAVEP06W",
+        "destinations": [
+          "con-001",
+          "seg-001"
+        ],
+        "reason": "该助理原文逐页重复“已完成目录核对的过程说明，没有新增操作或决定”，与既有结论条目范围（页0-11）及分段一致，无新增决定或执行结果。"
+      }
+    ],
+    "findings": [
+      {
+        "message_id": "msg-01M3V6AA1KT2XPDEXRWAVEP06W",
+        "detail": "原文中附件页0至页11每一页的同一句“这是已完成目录核对的过程说明，没有新增操作或决定。”各重复三次，属重复文本而非多页不同内容；既有结论条目的范围“附件页0-11”与原文一致，未夸大覆盖范围。"
+      },
+      {
+        "message_id": "msg-01M3V6AA0BC6NGW4Z57696FX6B",
+        "detail": "原文只表明已查看目录、尚未转换或支付，未提供完成证据；既有结果条目未声明任何完成，核对无状态反转。"
+      },
+      {
+        "message_id": "msg-01M3V6A9Z6DZW7HR689HYHCPE1",
+        "detail": "原文数字与例外齐全：总费用最多500元、单项离线格式转换费不得超过80元、仅该费项可先付、其他费用先询问、不得上传原文或联网；既有要求条目逐字对应，无遗漏或条件反转。"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1 @@
+{"status":429,"request_id":"req-anthropic-rate","body":{"type":"error","error":{"type":"rate_limit_error","message":"synthetic rate limit"},"request_id":"req-anthropic-rate"}}

@@ -1,0 +1,11 @@
+{
+  "model": "gpt-fixture",
+  "messages": [
+    {"role": "system", "content": "You are Reins."},
+    {"role": "user", "content": "read a.txt"},
+    {"role": "assistant", "content": "", "tool_calls": [{"id": "c1", "type": "function", "function": {"name": "read", "arguments": "{\"path\":\"a.txt\"}"}}]},
+    {"role": "tool", "tool_call_id": "c1", "content": "content"}
+  ],
+  "tools": [{"type": "function", "function": {"name": "read", "description": "Read one path", "parameters": {"type": "object"}}}],
+  "stream": false
+}

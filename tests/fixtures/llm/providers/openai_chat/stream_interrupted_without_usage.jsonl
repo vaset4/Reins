@@ -1,0 +1,1 @@
+{"id":"chat-interrupted","object":"chat.completion.chunk","created":1,"model":"gpt-fixture","choices":[{"index":0,"delta":{"role":"assistant","content":"partial"},"finish_reason":null}]}

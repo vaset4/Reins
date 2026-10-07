@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>智能体运行记录器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/styles.css">
+<link rel="stylesheet" href="/static/story.css">
+<link rel="stylesheet" href="/static/sessionFiles.css">
+<link rel="stylesheet" href="/static/evidence.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand-lockup">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M4 6h16M4 12h10M4 18h16"/>
+        <path d="M17 9l3 3-3 3"/>
+      </svg>
+    </span>
+    <div>
+      <h1>智能体运行记录器</h1>
+      <p>把一次智能体运行讲成人能读懂的故事，同时保留完整证据。</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <span class="data-root-badge" id="data-root-badge">加载中...</span>
+    <button class="icon-btn" id="btn-refresh" type="button" title="刷新">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+        <path d="M21 3v6h-6"/>
+      </svg>
+    </button>
+    <label class="switch" title="自动刷新运行中的运行">
+      <input type="checkbox" id="auto-refresh" checked>
+      <span class="switch-track"><span class="switch-dot"></span></span>
+      <span>实时</span>
+    </label>
+  </div>
+</header>
+
+<main class="workspace">
+  <aside class="session-rail" aria-label="会话列表">
+    <div class="rail-header">
+      <div>
+        <span class="section-kicker">会话</span>
+        <b id="session-count">0</b>
+      </div>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="m20 20-3.5-3.5"/>
+        </svg>
+        <input id="search-input" type="search" placeholder="搜索会话、状态或摘要" autocomplete="off">
+      </div>
+    </div>
+    <div class="session-list" id="session-list"></div>
+  </aside>
+
+  <section class="story-column" aria-label="运行故事">
+    <div class="run-strip">
+      <div>
+        <span class="section-kicker">当前运行</span>
+        <h2 id="run-title">未选择</h2>
+      </div>
+      <div class="run-list" id="run-list"></div>
+    </div>
+    <div class="empty-state" id="empty-state">
+      <h2>选择一次运行</h2>
+      <p>左侧选择会话后，这里会按“用户问题、上下文、模型决策、工具调用、风险提示”的顺序解释运行过程。</p>
+    </div>
+    <div class="story-root" id="story-root"></div>
+    <details class="debug-shell">
+      <summary>原始面板数据</summary>
+      <div id="debug-panels"></div>
+    </details>
+  </section>
+
+  <aside class="evidence-drawer" aria-label="证据抽屉">
+    <div class="drawer-header">
+      <div>
+        <span class="section-kicker">证据</span>
+        <h2 id="evidence-title">证据</h2>
+      </div>
+      <div class="drawer-actions">
+        <button class="icon-btn" id="evidence-fullscreen" type="button" title="全屏阅读">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>
+          </svg>
+        </button>
+        <button class="icon-btn" id="evidence-close" type="button" title="清空证据">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="evidence-body" id="evidence-body"></div>
+  </aside>
+</main>
+
+<script type="module" src="/static/app.js"></script>
+</body>
+</html>

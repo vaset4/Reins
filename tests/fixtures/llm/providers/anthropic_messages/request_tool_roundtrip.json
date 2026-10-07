@@ -1,0 +1,12 @@
+{
+  "model": "claude-fixture",
+  "max_tokens": 4096,
+  "system": [{"type": "text", "text": "You are Reins."}],
+  "messages": [
+    {"role": "user", "content": [{"type": "text", "text": "read a.txt"}]},
+    {"role": "assistant", "content": [{"type": "tool_use", "id": "c1", "name": "read", "input": {"path": "a.txt"}}]},
+    {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "c1", "content": "content", "is_error": false}]}
+  ],
+  "stream": false,
+  "tools": [{"name": "read", "description": "Read one path", "input_schema": {"type": "object"}}]
+}

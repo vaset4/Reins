@@ -1,0 +1,12 @@
+{
+  "api_family": "anthropic_messages",
+  "sdk_package": "anthropic",
+  "sdk_version": "0.122.0",
+  "source_url": "https://github.com/anthropics/anthropic-sdk-python/tree/v0.122.0/src/anthropic/types",
+  "source_tag": "v0.122.0",
+  "captured_at": "2026-08-19",
+  "fixture_kind": "synthetic_provider_protocol_golden",
+  "contains_secrets": false,
+  "raw_event_types": ["message_start", "content_block_start", "content_block_delta", "content_block_stop", "message_delta", "message_stop"],
+  "redaction": "synthetic fixture values only"
+}

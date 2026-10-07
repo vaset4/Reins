@@ -1,0 +1,180 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - "phase-*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,browser,vision,mcp,tui]"
+
+      - name: Install Playwright Chromium
+        shell: pwsh
+        run: python -m playwright install chromium
+
+      - name: Ruff check
+        shell: pwsh
+        run: >-
+          ruff check
+          app approval context frontends llm memory runtime scripts
+          reins_secrets skills tasks tools triggers tests
+
+      - name: Ruff format Python sources
+        shell: pwsh
+        run: ruff format --check .
+
+      - name: Type check critical owners
+        shell: pwsh
+        run: |
+          $paths = @(
+            "app/cli.py",
+            "app/run_task.py",
+            "app/startup.py",
+            "approval/__init__.py",
+            "frontends/shared/session_search.py",
+            "frontends/tui/main.py",
+            "llm/model_request.py",
+            "llm/parser.py",
+            "llm/prompt_composer.py",
+            "runtime/agent_loop.py",
+            "runtime/checkpoint.py",
+            "runtime/checkpoint_view.py",
+            "runtime/run_facts.py",
+            "runtime/schema_meta.py",
+            "runtime/session_state.py",
+            "runtime/types.py",
+            "runtime/watchdog.py",
+            "tools/browser/playwright_adapter.py",
+            "tools/tool_registry.py",
+            "triggers/resume.py",
+            "scripts/stable_ux_acceptance.py",
+            "scripts/stable_ux_scenarios.py",
+            "scripts/stable_ux_oracles.py",
+            "scripts/run_with_timeout.py"
+          )
+          mypy --strict @paths
+
+      - name: Check tracked artifacts
+        shell: pwsh
+        run: python scripts/check_tracked_artifacts.py
+
+      - name: Build wheel and run clean TUI smoke
+        shell: pwsh
+        run: |
+          python -m pip wheel . --no-deps --wheel-dir dist
+          $wheels = @(Get-ChildItem -LiteralPath dist -Filter '*.whl')
+          if ($wheels.Count -ne 1) {
+            throw "Expected exactly one wheel, found $($wheels.Count)"
+          }
+
+          $venvRoot = Join-Path $env:RUNNER_TEMP "reins-clean-tui-$env:GITHUB_RUN_ATTEMPT"
+          $smokeRoot = Join-Path $env:RUNNER_TEMP "reins-wheel-smoke-$env:GITHUB_RUN_ATTEMPT"
+          python -m venv $venvRoot
+          New-Item -ItemType Directory -Path $smokeRoot | Out-Null
+
+          $venvPython = Join-Path $venvRoot "Scripts/python.exe"
+          $tuiEntry = Join-Path $venvRoot "Scripts/reins-tui.exe"
+          "REINS_PACKAGING_WHEEL=$($wheels[0].FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "REINS_PACKAGING_VENV=$venvRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          $wheelWithTui = $wheels[0].FullName + "[tui]"
+          & $venvPython -m pip install $wheelWithTui
+          if ($LASTEXITCODE -ne 0) {
+            exit $LASTEXITCODE
+          }
+
+          Push-Location $smokeRoot
+          try {
+            & $tuiEntry --help
+            if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+            }
+            & $venvPython -c "import approval.tui"
+            if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+            }
+          } finally {
+            Pop-Location
+          }
+
+      - name: Collect full test suite
+        shell: pwsh
+        run: >-
+          python scripts/run_with_timeout.py --seconds 60 --
+          python -m pytest --collect-only -q
+
+      - name: Run ordinary test shards
+        shell: pwsh
+        run: |
+          $ordinaryTests = @(
+            git ls-files -- 'tests/test_*.py' 'tests/**/test_*.py' |
+              Where-Object { $_ -notlike 'tests/acceptance/*' } |
+              Sort-Object -Unique
+          )
+          if ($LASTEXITCODE -ne 0 -or $ordinaryTests.Count -eq 0) {
+            throw "No ordinary test files were discovered"
+          }
+          $shardCount = [Math]::Min(128, $ordinaryTests.Count)
+          for ($shardIndex = 0; $shardIndex -lt $shardCount; $shardIndex++) {
+            $shard = @()
+            for ($index = $shardIndex; $index -lt $ordinaryTests.Count; $index += $shardCount) {
+              $shard += $ordinaryTests[$index]
+            }
+            Write-Output "Running ordinary shard $($shardIndex + 1)/$shardCount with $($shard.Count) files"
+            python scripts/run_with_timeout.py --seconds 60 -- python -m pytest -q -- @shard
+            if ($LASTEXITCODE -ne 0) {
+              exit $LASTEXITCODE
+            }
+          }
+
+      - name: Run acceptance tests
+        shell: pwsh
+        run: |
+          $acceptanceTests = @(git ls-files -- 'tests/acceptance/test_*.py')
+          if ($LASTEXITCODE -ne 0 -or $acceptanceTests.Count -eq 0) {
+            throw "No acceptance test files were discovered"
+          }
+          foreach ($testFile in $acceptanceTests) {
+            python scripts/run_with_timeout.py --seconds 60 -- python -m pytest -q $testFile
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Run deterministic stable UX acceptance
+        shell: pwsh
+        run: |
+          $failed = $false
+          foreach ($scenario in 1..7) {
+            python scripts/run_with_timeout.py --seconds 60 -- python -m scripts.stable_ux_acceptance --scenario "scenario_$scenario" --output "ci-artifacts/scenario-$scenario/report.json"
+            if ($LASTEXITCODE -ne 0) { $failed = $true }
+          }
+          if ($failed) { exit 1 }
+
+      - name: Upload deterministic acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stable-ux-acceptance
+          path: ci-artifacts/**
+          if-no-files-found: error
+

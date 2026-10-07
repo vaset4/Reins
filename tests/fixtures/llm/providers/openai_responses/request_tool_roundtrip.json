@@ -1,0 +1,11 @@
+{
+  "model": "gpt-fixture",
+  "instructions": "You are Reins.",
+  "input": [
+    {"role": "user", "content": [{"type": "input_text", "text": "read a.txt"}]},
+    {"type": "function_call", "call_id": "c1", "name": "read", "arguments": "{\"path\":\"a.txt\"}"},
+    {"type": "function_call_output", "call_id": "c1", "output": "content"}
+  ],
+  "stream": false,
+  "tools": [{"type": "function", "name": "read", "description": "Read one path", "parameters": {"type": "object"}, "strict": false}]
+}

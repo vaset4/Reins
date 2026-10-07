@@ -1,0 +1,12 @@
+{
+  "api_family": "openai_chat",
+  "sdk_package": "openai",
+  "sdk_version": "3.2.0",
+  "source_url": "https://github.com/openai/openai-python/tree/v3.2.0/src/openai/types/chat",
+  "source_tag": "v3.2.0",
+  "captured_at": "2026-08-19",
+  "fixture_kind": "synthetic_provider_protocol_golden",
+  "contains_secrets": false,
+  "raw_event_types": ["chat.completion.chunk"],
+  "redaction": "synthetic fixture values only"
+}

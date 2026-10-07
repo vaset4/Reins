@@ -1,0 +1,6 @@
+{"kind":"response_start","sequence":0,"message_id":"resp-text"}
+{"kind":"content_start","sequence":1,"block_id":"text:msg-1:0","content_kind":"text"}
+{"kind":"content_delta","sequence":2,"block_id":"text:msg-1:0","delta":"hello"}
+{"kind":"content_end","sequence":3,"block_id":"text:msg-1:0"}
+{"kind":"usage_update","sequence":4,"input_tokens":1,"output_tokens":1,"total_tokens":2,"cache_read_input_tokens":0}
+{"kind":"response_done","sequence":5,"stop_reason":"end_turn"}
